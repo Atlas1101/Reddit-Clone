@@ -5,7 +5,11 @@ import Post from "../models/postSchema";
 import User from "../models/userSchema";
 import Vote from "../models/voteSchema";
 import { z } from "zod";
-import { commentSchema, CommentInput,objectIdSchema } from "../middleware/validateAuth";
+import {
+    commentSchema,
+    CommentInput,
+    objectIdSchema,
+} from "../middleware/validateAuth";
 
 // ✅ Define Authenticated Request Type
 interface AuthRequest extends Request {
@@ -16,11 +20,14 @@ interface AuthRequest extends Request {
 export const createComment = async (req: AuthRequest, res: Response) => {
     try {
         // Validate request body
-        const { postId, content, parentCommentId }: CommentInput = commentSchema.parse(req.body);
+        const { postId, content, parentCommentId }: CommentInput =
+            commentSchema.parse(req.body);
 
         // ✅ Ensure user is authenticated
         if (!req.user) {
-            return res.status(401).json({ message: "Unauthorized: User not authenticated" });
+            return res
+                .status(401)
+                .json({ message: "Unauthorized: User not authenticated" });
         }
         const userId = req.user.id;
 
@@ -35,32 +42,55 @@ export const createComment = async (req: AuthRequest, res: Response) => {
 
             // If replying, ensure parent comment exists
             if (parentCommentId) {
-                const parentComment = await Comment.findById(parentCommentId).session(session);
+                const parentComment = await Comment.findById(
+                    parentCommentId
+                ).session(session);
                 if (!parentComment) throw new Error("Parent comment not found");
             }
 
             // Create the new comment
             const [comment] = await Comment.create(
-                [{ post: postId, parentComment: parentCommentId || null, author: userId, content }],
+                [
+                    {
+                        post: postId,
+                        parentComment: parentCommentId || null,
+                        author: userId,
+                        content,
+                    },
+                ],
                 { session }
             );
 
             // If top-level comment, increment post's comment count
             if (!parentCommentId) {
-                await Post.findByIdAndUpdate(postId, { $inc: { commentCount: 1 } }, { session });
+                await Post.findByIdAndUpdate(
+                    postId,
+                    { $inc: { commentCount: 1 } },
+                    { session }
+                );
             } else {
                 // If reply, increment parent comment's replies count
-                await Comment.findByIdAndUpdate(parentCommentId, { $inc: { repliesCount: 1 } }, { session });
+                await Comment.findByIdAndUpdate(
+                    parentCommentId,
+                    { $inc: { repliesCount: 1 } },
+                    { session }
+                );
             }
 
             // Increment user karma (optional feature)
-            await User.findByIdAndUpdate(userId, { $inc: { karma: 1 } }, { session });
+            await User.findByIdAndUpdate(
+                userId,
+                { $inc: { karma: 1 } },
+                { session }
+            );
 
             // Commit transaction
             await session.commitTransaction();
             session.endSession();
 
-            return res.status(201).json({ message: "Comment created successfully", comment });
+            return res
+                .status(201)
+                .json({ message: "Comment created successfully", comment });
         } catch (error) {
             await session.abortTransaction();
             session.endSession();
@@ -68,13 +98,14 @@ export const createComment = async (req: AuthRequest, res: Response) => {
         }
     } catch (error) {
         if (error instanceof z.ZodError) {
-            return res.status(400).json({ message: "Validation error", errors: error.errors });
+            return res
+                .status(400)
+                .json({ message: "Validation error", errors: error.errors });
         }
         console.error("Server error:", error);
         return res.status(500).json({ message: "Error creating comment" });
     }
 };
-
 
 // 📌 GET COMMENTS FOR A POST
 export const getCommentsByPost = async (req: Request, res: Response) => {
@@ -90,9 +121,14 @@ export const getCommentsByPost = async (req: Request, res: Response) => {
         return res.status(200).json(comments);
     } catch (error) {
         if (error instanceof z.ZodError) {
-            return res.status(400).json({ message: "Validation error", errors: error.errors });
+            return res
+                .status(400)
+                .json({ message: "Validation error", errors: error.errors });
         }
-        return res.status(500).json({ message: "Error fetching comments", error: (error as Error).message });
+        return res.status(500).json({
+            message: "Error fetching comments",
+            error: (error as Error).message,
+        });
     }
 };
 
@@ -137,12 +173,10 @@ export const updateComment = async (req: AuthRequest, res: Response) => {
                 .status(400)
                 .json({ message: "Validation error", errors: error.errors });
         }
-        return res
-            .status(500)
-            .json({
-                message: "Error updating comment",
-                error: (error as Error).message,
-            });
+        return res.status(500).json({
+            message: "Error updating comment",
+            error: (error as Error).message,
+        });
     }
 };
 
@@ -163,8 +197,13 @@ export const deleteComment = async (req: AuthRequest, res: Response) => {
         }
         const userId = req.user.id;
 
+        // ✅ Convert `commentId` to `ObjectId`
+        const commentObjectId = new mongoose.Types.ObjectId(commentId);
+
         // ✅ Find the comment
-        const comment = await Comment.findById(commentId).session(session);
+        const comment = await Comment.findById(commentObjectId).session(
+            session
+        );
         if (!comment) {
             return res.status(404).json({ message: "Comment not found" });
         }
@@ -179,7 +218,7 @@ export const deleteComment = async (req: AuthRequest, res: Response) => {
         // ✅ Recursive function to find all child comments
         const getAllChildComments = async (
             parentIds: mongoose.Types.ObjectId[]
-        ) => {
+        ): Promise<mongoose.Types.ObjectId[]> => {
             let allChildComments: mongoose.Types.ObjectId[] = [];
             const children = await Comment.find({
                 parentComment: { $in: parentIds },
@@ -188,7 +227,9 @@ export const deleteComment = async (req: AuthRequest, res: Response) => {
                 .session(session);
 
             if (children.length > 0) {
-                const childIds = children.map((c) => c._id);
+                const childIds: mongoose.Types.ObjectId[] = children.map(
+                    (c) => c._id as mongoose.Types.ObjectId
+                );
                 allChildComments = allChildComments.concat(
                     childIds,
                     await getAllChildComments(childIds)
@@ -198,20 +239,23 @@ export const deleteComment = async (req: AuthRequest, res: Response) => {
             return allChildComments;
         };
 
+        // ✅ Get all comments to delete (parent + all children)
         const allCommentsToDelete = [
-            commentId,
-            ...(await getAllChildComments([commentId])),
+            commentObjectId,
+            ...(await getAllChildComments([commentObjectId])),
         ];
 
         // ✅ Get all votes related to the comment and its children
         const allVotes = await Vote.find({
             target: { $in: allCommentsToDelete },
             targetType: "comment",
-        }).session(session);
+        })
+            .lean() // ✅ Fixes `.value` access issue
+            .session(session);
 
         // ✅ Sum up vote scores for karma deduction
         const totalKarmaLoss = allVotes.reduce(
-            (sum, vote) => sum + vote.value,
+            (sum, vote) => sum + vote.voteType,
             0
         );
 
@@ -229,9 +273,9 @@ export const deleteComment = async (req: AuthRequest, res: Response) => {
         }).session(session);
 
         // ✅ Delete all child comments recursively
-        await Comment.deleteMany({ _id: { $in: allCommentsToDelete } }).session(
-            session
-        );
+        await Comment.deleteMany({
+            _id: { $in: allCommentsToDelete },
+        }).session(session);
 
         // ✅ Update parent comment's `repliesCount` OR post's `commentCount`
         if (comment.parentComment) {
@@ -265,11 +309,9 @@ export const deleteComment = async (req: AuthRequest, res: Response) => {
                 .json({ message: "Validation error", errors: error.errors });
         }
 
-        return res
-            .status(500)
-            .json({
-                message: "Error deleting comment",
-                error: (error as Error).message,
-            });
+        return res.status(500).json({
+            message: "Error deleting comment",
+            error: (error as Error).message,
+        });
     }
 };

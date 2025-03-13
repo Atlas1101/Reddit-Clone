@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 // Helper function to validate MongoDB ObjectId
-const objectIdSchema = z.string().length(24, "Invalid ObjectId format");
+export const objectIdSchema = z.string().length(24, "Invalid ObjectId format");
 
 // User Registration Schema
 export const userRegisterSchema = z.object({
