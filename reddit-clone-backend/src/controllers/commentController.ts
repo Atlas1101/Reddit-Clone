@@ -95,6 +95,8 @@ export const createComment = async (req: AuthRequest, res: Response) => {
             await session.abortTransaction();
             session.endSession();
             return res.status(400).json({ message: (error as Error).message });
+        } finally {
+            session.endSession();
         }
     } catch (error) {
         if (error instanceof z.ZodError) {
