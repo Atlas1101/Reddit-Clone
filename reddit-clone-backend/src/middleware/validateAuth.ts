@@ -28,6 +28,8 @@ export const postSchema = z.object({
     community: z.string().min(1, "Community is required"),
     createdAt: z.date().optional(), // Mongoose timestamps handle this
 });
+
+//  TypeScript type inference (optional)
 export type PostSchemaType = z.infer<typeof postSchema>;
 
 // Zod schema for a comment
@@ -40,3 +42,4 @@ export const commentSchema = z.object({
 
 //  TypeScript type inference (optional)
 export type CommentInput = z.infer<typeof commentSchema>;
+

@@ -46,26 +46,24 @@ export const createComment = async (req: AuthRequest, res: Response) => {
             );
 
             // If top-level comment, increment post's comment count
-            if (!parentCommentId) {
+            if (!parentCommentId) { // validate check  might be unnecessary 
                 await Post.findByIdAndUpdate(postId, { $inc: { commentCount: 1 } }, { session });
             } else {
                 // If reply, increment parent comment's replies count
                 await Comment.findByIdAndUpdate(parentCommentId, { $inc: { repliesCount: 1 } }, { session });
             }
-
+ 
             // Increment user karma (optional feature)
             await User.findByIdAndUpdate(userId, { $inc: { karma: 1 } }, { session });
 
             // Commit transaction
-            await session.commitTransaction();
-            session.endSession();
-
+            await session.commitTransaction()     
             return res.status(201).json({ message: "Comment created successfully", comment });
-        } catch (error) {
-            await session.abortTransaction();
-            session.endSession();
+        } catch (error) {                  
+            await session.abortTransaction();   
             return res.status(400).json({ message: (error as Error).message });
         }
+        finally { session.endSession();}
     } catch (error) {
         if (error instanceof z.ZodError) {
             return res.status(400).json({ message: "Validation error", errors: error.errors });
@@ -73,7 +71,7 @@ export const createComment = async (req: AuthRequest, res: Response) => {
         console.error("Server error:", error);
         return res.status(500).json({ message: "Error creating comment" });
     }
-};
+}; 
 
 
 // 📌 GET COMMENTS FOR A POST
