@@ -17,20 +17,30 @@ export const createComment = async (
     req: AuthRequest,
     res: Response
 ): Promise<void> => {
+    console.log("➡️ Received request to create comment");
+
     try {
         if (!req.user) {
+            console.warn("⛔ No user on request (unauthenticated)");
             res.status(401).json({
                 message: "Unauthorized: User not authenticated",
             });
             return;
         }
 
-        const comment = await createCommentService(
-            { ...req.body, author: req.user.id },
-            req.user.id // this arg is now optional — kept only if you use it elsewhere
-        );
+        const input = { ...req.body, author: req.user.id };
+        console.log("📦 Input to service:", input);
+
+        const comment = await createCommentService(input, req.user.id);
+
+        console.log("✅ Comment created:", comment);
+        res.status(201).json({
+            message: "Comment created successfully",
+            comment,
+        });
     } catch (error) {
         if (error instanceof z.ZodError) {
+            console.error("❌ Zod validation error:", error.errors);
             res.status(400).json({
                 message: "Validation error",
                 errors: error.errors,
@@ -38,7 +48,10 @@ export const createComment = async (
             return;
         }
 
-        res.status(400).json({ message: (error as Error).message });
+        console.error("🔥 Unexpected error in createComment:", error);
+        res.status(500).json({
+            message: "Internal server error",
+        });
     }
 };
 
