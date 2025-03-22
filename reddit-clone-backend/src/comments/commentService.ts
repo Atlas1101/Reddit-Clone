@@ -107,6 +107,13 @@ export const updateCommentService = async (
     const commentId = objectIdSchema.parse(commentIdRaw);
     const { content } = commentSchema.pick({ content: true }).parse(contentRaw);
 
+    const comment = await Comment.findById(commentId);
+    if (!comment) throw new Error("Comment not found");
+
+    if (comment.author.toString() !== userId) {
+        throw new Error("Unauthorized");
+    }
+
     const updated = await Comment.findOneAndUpdate(
         { _id: commentId, author: userId },
         { content },
@@ -115,6 +122,7 @@ export const updateCommentService = async (
 
     return updated;
 };
+
 
 export const deleteCommentService = async (
     commentIdRaw: string,
@@ -165,7 +173,6 @@ export const deleteCommentService = async (
             _id: { $in: allCommentsToDelete },
         }).session(session);
 
-        // ✅ Safe branching for count update
         if (comment.parentComment) {
             await Comment.findByIdAndUpdate(
                 comment.parentComment,
