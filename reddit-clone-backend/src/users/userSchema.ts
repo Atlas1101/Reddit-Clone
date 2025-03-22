@@ -3,10 +3,11 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 export interface IUser extends mongoose.Document {
-    _id: mongoose.Types.ObjectId; // ✅ Explicitly define _id type
+    _id: mongoose.Types.ObjectId;
     username: string;
     email: string;
     password: string;
+    karma: number; // ✅ added karma
     comparePassword: (password: string) => Promise<boolean>;
     generateAuthToken: () => string;
 }
@@ -16,10 +17,10 @@ const UserSchema = new mongoose.Schema<IUser>(
         username: { type: String, required: true, unique: true },
         email: { type: String, required: true, unique: true },
         password: { type: String, required: true },
+        karma: { type: Number, default: 0 }, // ✅ added karma default
     },
     { timestamps: true }
 );
-
 // Hash password before saving
 UserSchema.pre("save", async function (next) {
     if (!this.isModified("password")) return next();

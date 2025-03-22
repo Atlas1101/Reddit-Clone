@@ -1,10 +1,10 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import bcrypt from "bcryptjs";
-import User from "../models/userSchema";
-import Post from "../models/postSchema";
-import Comment from "../models/commentSchema";
-import Vote from "../models/voteSchema";
+import User from "../users/userSchema";
+import Post from "../posts/postSchema";
+import Comment from "../comments/commentSchema";
+import Vote from "../votes/voteSchema";
 import connectDB from "./db";
 
 dotenv.config();

@@ -5,6 +5,7 @@ interface IComment extends mongoose.Document {
     author: mongoose.Schema.Types.ObjectId;
     post: mongoose.Schema.Types.ObjectId;
     parentComment?: mongoose.Schema.Types.ObjectId;
+    repliesCount: number; // ✅ Add this
     createdAt: Date;
 }
 
@@ -26,9 +27,9 @@ const CommentSchema = new mongoose.Schema<IComment>(
             ref: "Comment",
             default: null,
         },
+        repliesCount: { type: Number, default: 0 }, // ✅ Add this
     },
     { timestamps: true }
 );
-
 const Comment = mongoose.model<IComment>("Comment", CommentSchema);
 export default Comment;
