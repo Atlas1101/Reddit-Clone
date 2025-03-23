@@ -60,6 +60,13 @@ export default function Navbar() {
 
                 {/* Right: login + 3-dot menu */}
                 <div className="flex items-center space-x-2">
+                    <Link
+                        to="/submit"
+                        className="flex items-center space-x-1 px-3 py-1 rounded-full hover:bg-gray-200 transition"
+                    >
+                        <span className="text-xl font-light">＋</span>
+                        <span className="text-sm font-medium">Create</span>
+                    </Link>
                     <button className="bg-orange-600 text-white text-sm rounded-full px-4 py-1 font-semibold hover:bg-orange-700">
                         Log In
                     </button>
