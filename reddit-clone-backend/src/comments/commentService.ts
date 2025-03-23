@@ -47,6 +47,20 @@ export const createCommentService = async (input: unknown, userId: string) => {
                 session
             );
             if (!parent) throw new Error("Parent comment not found");
+
+            // ✅ Ensure parent belongs to same post
+            const parentPostId = new mongoose.Types.ObjectId(
+                parent.post.toString()
+            );
+            const expectedPostId = new mongoose.Types.ObjectId(
+                postId.toString()
+            );
+
+            if (!parentPostId.equals(expectedPostId)) {
+                throw new Error(
+                    "Parent comment does not belong to the given post"
+                );
+            }
         }
 
         const [comment] = await Comment.create(
