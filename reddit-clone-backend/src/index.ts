@@ -10,10 +10,11 @@ import postRoutes from "./posts/postRoutes";
 import commentRoutes from "./comments/commentRoutes";
 import voteRoutes from "./votes/voteRoutes";
 import userRoutes from "./users/userRoutes";
-
+import communityRoutes from "./community/communityRoutes";
 
 import "./users/userSchema";
 import "./posts/postSchema";
+import "./community/communitySchema";
 
 dotenv.config();
 connectDB();
@@ -36,6 +37,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/votes", voteRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/communities", communityRoutes);
 
 app.get("/", (req, res) => {
     res.send("API is running...aww yeee");
