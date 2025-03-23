@@ -9,6 +9,8 @@ import authRoutes from "./authentication/authRoutes";
 import postRoutes from "./posts/postRoutes";
 import commentRoutes from "./comments/commentRoutes";
 import voteRoutes from "./votes/voteRoutes";
+import userRoutes from "./users/userRoutes";
+
 
 import "./users/userSchema";
 import "./posts/postSchema";
@@ -29,6 +31,7 @@ app.use(
 app.use(cookieParser());
 
 // Route registration
+app.use("/api/auth", userRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/comments", commentRoutes);
