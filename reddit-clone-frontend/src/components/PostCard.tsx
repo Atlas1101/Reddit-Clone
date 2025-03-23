@@ -5,6 +5,8 @@ import DownvoteIcon from "../assets/downvote-icon.svg";
 import CommentIcon from "../assets/comment-icon.svg";
 import ShareIcon from "../assets/share-icon.svg";
 import AwardIcon from "../assets/award-icon.svg";
+import CloseIcon from "../assets/close-icon.svg";
+import { useState } from "react";
 
 type PostProps = {
     id: string;
@@ -29,8 +31,18 @@ export default function PostCard({
     imageUrl,
     subreddit = "exampleSub",
 }: PostProps) {
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const handleImageClick = () => {
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+    };
+
     return (
-        <div className="bg-white  shadow text-black space-y-1">
+        <div className="bg-white shadow text-black space-y-1">
             {/* Subreddit + time + join */}
             <div className="flex items-center justify-between text-xs text-gray-500">
                 <div className="flex items-center space-x-2">
@@ -70,7 +82,32 @@ export default function PostCard({
                     src={imageUrl}
                     alt="Post visual"
                     className="w-full max-h-[512px] object-cover rounded-2xl"
+                    onClick={handleImageClick}
                 />
+            )}
+
+            {/* Modal */}
+            {isModalOpen && (
+                <div className="fixed bg-black inset-0 bg-opacity-75 flex justify-center items-center z-50">
+                        <button
+                            onClick={closeModal}
+                            className="absolute top-2 right-2 text-white text-2xl z-100 bg-black rounded-full p-4 opacity-70 "
+                        >
+                            <img
+                                src={CloseIcon}
+                                alt="Close"
+                                className="w-6 h-6"
+                                style={{ filter: 'invert(1)' }} // This will make the icon white
+                            />
+                        </button>
+                        <div className="relative">
+                            <img
+                                src={imageUrl}
+                                alt="Post visual"
+                                className="max-w-full max-h-full"
+                            />
+                        </div>
+                </div>
             )}
 
             {/* Action bar */}

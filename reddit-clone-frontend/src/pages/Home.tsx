@@ -1,5 +1,5 @@
 import PostCard from "../components/PostCard";
-import randomImage from "../assets/random.png";
+import randomImage from "../assets/random.jpg";
 
 const dummyPosts = [
     {
@@ -27,7 +27,7 @@ const dummyPosts = [
         score: 87,
         comments: 12,
         createdAt: "5 hours ago",
-        body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+        body: "",
         imageUrl: randomImage,  
     },
 ];
