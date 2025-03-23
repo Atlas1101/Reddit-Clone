@@ -17,8 +17,8 @@ export const castVoteService = async ({
 
     const existing = await Vote.findOne({
         user: userId,
-        target: targetId,
-        targetType,
+        entityId: targetId,   
+        entityType: targetType, 
     });
 
     if (existing) {
@@ -33,8 +33,8 @@ export const castVoteService = async ({
 
     const newVote = new Vote({
         user: new mongoose.Types.ObjectId(userId),
-        target: targetId,
-        targetType,
+        entityId: targetId,   
+        entityType: targetType, 
         voteType,
     });
 
@@ -55,8 +55,8 @@ export const removeVoteService = async ({
 
     const result = await Vote.findOneAndDelete({
         user: userId,
-        target: targetId,
-        targetType,
+        entityId: targetId,      
+        entityType: targetType,  
     });
 
     if (!result) throw new Error("Vote not found");
