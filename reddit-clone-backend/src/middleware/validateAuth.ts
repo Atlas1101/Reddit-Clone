@@ -21,6 +21,7 @@ export const createPostInputSchema = z.object({
     title: z.string().min(1, "Title is required"),
     content: z.string().min(10, "Content must be at least 10 characters"),
     community: z.string().min(1, "Community is required"),
+    postType: z.enum(["text", "image", "link", "poll"]),
 });
 
 // ✅ Full Post Schema — used internally with injected fields

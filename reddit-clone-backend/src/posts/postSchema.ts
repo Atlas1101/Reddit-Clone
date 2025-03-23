@@ -1,11 +1,15 @@
 import mongoose from "mongoose";
+
+type PostType = "text" | "image" | "link" | "poll";
+
 interface IPost extends mongoose.Document {
     title: string;
     content: string;
     author: mongoose.Schema.Types.ObjectId;
     community: string;
+    postType: PostType; // ✅ NEW
+    commentCount: number;
     createdAt: Date;
-    commentCount: number; // ✅ Add this
 }
 
 const PostSchema = new mongoose.Schema<IPost>(
@@ -18,9 +22,15 @@ const PostSchema = new mongoose.Schema<IPost>(
             required: true,
         },
         community: { type: String, required: true },
-        commentCount: { type: Number, default: 0 }, // ✅ Add this
+        postType: {
+            type: String,
+            enum: ["text", "image", "link", "poll"], // ✅ NEW
+            required: true,
+        },
+        commentCount: { type: Number, default: 0 },
     },
     { timestamps: true }
 );
+
 const Post = mongoose.model<IPost>("Post", PostSchema);
 export default Post;

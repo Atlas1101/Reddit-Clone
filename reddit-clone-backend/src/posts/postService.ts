@@ -26,19 +26,21 @@ export const createPostService = async (body: unknown, userId: string) => {
         throw new Error("Invalid request body");
     }
 
-    // ❌ Reject client if they try to override author
+    // Prevent user spoofing
     if ("author" in body && (body as any).author !== userId) {
         throw new Error(
             "Forbidden: Author ID does not match authenticated user."
         );
     }
 
-    const { title, content, community } = createPostInputSchema.parse(body);
+    const { title, content, community, postType } =
+        createPostInputSchema.parse(body); // ✅ now includes postType
 
     const post = new Post({
         title,
         content,
         community,
+        postType, // ✅ new
         author: userId,
     });
 
@@ -52,7 +54,10 @@ export const updatePostService = async (
     body: unknown,
     userId: string
 ) => {
-    const validatedData = postSchema.partial().parse(body);
+    const validatedData = postSchema
+        .omit({ postType: true }) // ✅ exclude postType
+        .partial()
+        .parse(body);
 
     const post = await Post.findById(id);
     if (!post) throw new Error("Post not found");
