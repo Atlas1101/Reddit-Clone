@@ -14,6 +14,7 @@ type Comment = {
     score: number;
     createdAt: string;
     replies?: Comment[];
+    isCollapsed?: boolean;
 };
 
 export default function PostPage() {
@@ -70,10 +71,25 @@ export default function PostPage() {
         setCommentText("");
     };
 
-    const CommentComponent = ({ comment, depth = 0 }: { comment: Comment; depth?: number }) => (
-        <div className={`ml-${depth * 4}`}>
-            <div className="bg-white rounded p-3 mb-2">
+    const CommentComponent = ({ comment, depth = 0 }: { comment: Comment; depth?: number }) => {
+        const [isCollapsed, setIsCollapsed] = useState(comment.isCollapsed || false);
+
+        const toggleCollapse = () => {
+            setIsCollapsed(!isCollapsed);
+        };
+
+        return (
+            <div className={`ml-${depth * 4}`}>
+            <div className="bg-white rounded p-3 mb-2 border border-gray-200">
                 <div className="flex items-center space-x-2 text-sm text-gray-500">
+                    {comment.replies && comment.replies.length > 0 && (
+                        <button
+                            onClick={toggleCollapse}
+                            className="text-gray-500 hover:text-gray-700 focus:outline-none"
+                        >
+                            {isCollapsed ? '[+]' : '[-]'}
+                        </button>
+                    )}
                     <span className="font-semibold text-gray-700">{comment.author}</span>
                     <span>•</span>
                     <span>{comment.createdAt}</span>
@@ -81,22 +97,31 @@ export default function PostPage() {
                 <p className="my-2">{comment.content}</p>
                 <div className="flex items-center space-x-4 text-sm">
                     <div className="flex items-center space-x-1">
-                        <button onClick={toggleUpvote}>
+                        <button 
+                            onClick={toggleUpvote}
+                            className={`hover:bg-gray-100 rounded ${isUpvoted ? 'text-orange-500' : ''}`}
+                        >
                             <img src={UpvoteIcon} alt="Upvote" className="w-4 h-4" />
                         </button>
-                        <span>{comment.score}</span>
-                        <button onClick={toggleDownvote}>
+                        <span className={`${isUpvoted ? 'text-orange-500' : isDownvoted ? 'text-blue-500' : ''}`}>
+                            {comment.score}
+                        </span>
+                        <button 
+                            onClick={toggleDownvote}
+                            className={`hover:bg-gray-100 rounded ${isDownvoted ? 'text-blue-500' : ''}`}
+                        >
                             <img src={DownvoteIcon} alt="Downvote" className="w-4 h-4" />
                         </button>
                     </div>
                     <button className="text-gray-500 hover:text-gray-700">Reply</button>
                 </div>
             </div>
-            {comment.replies?.map((reply) => (
+            {!isCollapsed && comment.replies?.map((reply) => (
                 <CommentComponent key={reply.id} comment={reply} depth={depth + 1} />
             ))}
         </div>
-    );
+        );
+    };
 
     return (
         <div className="max-w-3xl mx-auto p-4">
@@ -121,7 +146,7 @@ export default function PostPage() {
                     </div>
                     <div className="flex items-center space-x-1 bg-gray-100 rounded-full px-3 py-1">
                         <img src={CommentIcon} alt="Comments" className="w-5 h-5" />
-                        <span>{post.commentCount} Comments</span>
+                        {post.commentCount > 0 && <span>{post.commentCount} Comments</span>}
                     </div>
                     <button className="flex items-center space-x-1 bg-gray-100 rounded-full px-3 py-1">
                         <img src={ShareIcon} alt="Share" className="w-5 h-5" />
@@ -161,5 +186,6 @@ export default function PostPage() {
                 ))}
             </div>
         </div>
-    );
-}
+        );
+    };
+
