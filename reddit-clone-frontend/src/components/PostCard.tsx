@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useState } from "react";
 
 import UpvoteIcon from "../assets/upvote-icon.svg";
 import DownvoteIcon from "../assets/downvote-icon.svg";
@@ -6,7 +7,9 @@ import CommentIcon from "../assets/comment-icon.svg";
 import ShareIcon from "../assets/share-icon.svg";
 import AwardIcon from "../assets/award-icon.svg";
 import CloseIcon from "../assets/close-icon.svg";
-import { useState } from "react";
+import HideIcon from "../assets/hide-icon.svg";
+import ReportIcon from "../assets/report-icon.svg";
+import SaveIcon from "../assets/save-icon.svg";
 
 type PostProps = {
     id: string;
@@ -32,6 +35,9 @@ export default function PostCard({
     subreddit = "exampleSub",
 }: PostProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isOptionsOpen, setIsOptionsOpen] = useState(false);
+    const [isUpvoted, setIsUpvoted] = useState(false); // State for upvote
+    const [isDownvoted, setIsDownvoted] = useState(false); // State for downvote
 
     const handleImageClick = () => {
         setIsModalOpen(true);
@@ -41,8 +47,39 @@ export default function PostCard({
         setIsModalOpen(false);
     };
 
+    const toggleOptions = () => {
+        setIsOptionsOpen(!isOptionsOpen);
+    };
+
+    const toggleUpvote = () => {
+        setIsUpvoted(!isUpvoted);
+        if (isDownvoted) setIsDownvoted(false); // Reset downvote if upvoted
+    };
+
+    const toggleDownvote = () => {
+        setIsDownvoted(!isDownvoted);
+        if (isUpvoted) setIsUpvoted(false); // Reset upvote if downvoted
+    };
+
+    const handleShare = () => {
+        console.log('Share button pressed'); // Debugging log
+        if (navigator.share) {
+            navigator.share({
+                title: `Check out this post on r/${subreddit}`,
+                text: title,
+                url: window.location.href, // Use the current URL or a specific post URL
+            })
+            .then(() => console.log('Successful share'))
+            .catch((error) => console.log('Error sharing', error));
+        } else {
+            console.log('Web Share API is not supported in your browser.'); // Debugging log
+            alert('Web Share API is not supported in your browser.');
+        }
+    };
+
     return (
         <div className="bg-white shadow text-black space-y-1">
+
             {/* Subreddit + time + join */}
             <div className="flex items-center justify-between text-xs text-gray-500">
                 <div className="flex items-center space-x-2">
@@ -61,14 +98,49 @@ export default function PostCard({
                     <span>{createdAt}</span>
                 </div>
                 <div className="flex items-center space-x-3">
-                 <button className="text-white font-semibold text-xs hover:underline bg-blue-700 rounded-2xl p-1 px-3">
-                    Join
-                 </button>
-                 <button className="text-black font-semibold text-xl hover:underline">
-                    ...
-                 </button>
+                    <button className="text-white font-semibold text-xs hover:underline bg-blue-700 rounded-2xl p-1 px-3">
+                        Join
+                    </button>
+                    <button
+                        className="text-black font-semibold text-xl hover:underline"
+                        onClick={toggleOptions}
+                    >
+                        ...
+                    </button>
                 </div>
             </div>
+
+            {/* Options Modal */}
+            {isOptionsOpen && (
+                <div className="fixed inset-0 z-50">
+                    <div
+                        className="absolute inset-0 bg-black opacity-50"
+                        onClick={toggleOptions} // Close options when clicking outside
+                    ></div>
+                    <div className="absolute bottom-0 left-0 w-full bg-white flex flex-col shadow-lg rounded-t-2xl  ">
+                        <div className="flex justify-between items-center p-4 border-b">
+                            <span className="font-bold p-2">Options</span>
+                            <button onClick={toggleOptions} className="text-gray-600">
+                                <img src={CloseIcon} alt="Close" className="w-4 h-4" />
+                            </button>
+                        </div>
+                        <div className="p-4 text-sm ">
+                            <div className="flex items-center space-x-2 hover:bg-gray-100 p-2 rounded ">
+                                <img src={SaveIcon} alt="Save" className="w-5 h-5" />
+                                <span>Save</span>
+                            </div>
+                            <div className="flex items-center space-x-2 hover:bg-gray-100 p-2 rounded">
+                                <img src={HideIcon} alt="Hide" className="w-5 h-5" />
+                                <span>Hide</span>
+                            </div>
+                            <div className="flex items-center space-x-2 hover:bg-gray-100 p-2 rounded">
+                                <img src={ReportIcon} alt="Report" className="w-5 h-5" />
+                                <span>Report</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Title */}
             <h2 className="text-lg font-semibold text-gray-800">{title}</h2>
@@ -89,46 +161,58 @@ export default function PostCard({
             {/* Modal */}
             {isModalOpen && (
                 <div className="fixed bg-black inset-0 bg-opacity-75 flex justify-center items-center z-50">
-                        <button
-                            onClick={closeModal}
-                            className="absolute top-2 right-2 text-white text-2xl z-100 bg-black rounded-full p-4 opacity-70 "
-                        >
-                            <img
-                                src={CloseIcon}
-                                alt="Close"
-                                className="w-6 h-6"
-                                style={{ filter: 'invert(1)' }} // This will make the icon white
-                            />
-                        </button>
-                        <div className="relative">
-                            <img
-                                src={imageUrl}
-                                alt="Post visual"
-                                className="max-w-full max-h-full"
-                            />
-                        </div>
+                    <button
+                        onClick={closeModal}
+                        className="absolute top-4 right-4 text-white text-2xl z-50 rounded-full p-2"
+                        style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }} // Inline style for background opacity
+                    >
+                        <img src={CloseIcon} alt="Close" className="w-6 h-6" style={{ filter: 'invert(1)' }} />
+                    </button>
+                    <div className="relative">
+                        <img
+                            src={imageUrl}
+                            alt="Post visual"
+                            className="max-w-full max-h-full"
+                        />
+                    </div>
                 </div>
             )}
 
             {/* Action bar */}
             <div className="flex items-center text-sm text-black text-semibold space-x-5 py-2">
-                <div className="flex items-center space-x-1 bg-gray-200 p-1 rounded-full ">
-                    <img src={UpvoteIcon} alt="Upvote" className="w-5 h-5" />
+                <div
+                    className={`flex items-center space-x-1 p-1 rounded-full ${
+                        isUpvoted || isDownvoted ? 'bg-red-500 text-white' : 'bg-gray-200 text-black'
+                    }`}
+                >
+                    <div onClick={toggleUpvote} className="cursor-pointer">
+                        <img
+                            src={UpvoteIcon}
+                            alt="Upvote"
+                            className="w-5 h-5"
+                            style={{ color: isUpvoted ? 'white' : 'black' }}
+                        />
+                    </div>
                     <span>{score}</span>
-                    <div className="flex items-center space-x-1">
-                    <img src={DownvoteIcon} alt="Downvote" className="w-5 h-5" />
+                    <div onClick={toggleDownvote} className="cursor-pointer">
+                        <img
+                            src={DownvoteIcon}
+                            alt="Downvote"
+                            className="w-5 h-5"
+                            style={{ color: isDownvoted ? 'white' : 'black' }}
+                        />
+                    </div>
                 </div>
-                </div>
-                <div className="flex items-center space-x-1 bg-gray-200 p-1 rounded-full">
-                <img src={CommentIcon} alt="Comment" className="w-5 h-5" />
+                <Link to={`/post/${id}`} className="flex items-center space-x-1 bg-gray-200 p-1 rounded-full hover:bg-gray-300">
+                    <img src={CommentIcon} alt="Comment" className="w-5 h-5" />
                     <span>{comments}</span>
-                </div>
+                </Link>
                 <div className="flex items-center space-x-1 bg-gray-200 p-1 rounded-full">
-                <img src={AwardIcon} alt="Award" className="w-5 h-5" />
+                    <img src={AwardIcon} alt="Award" className="w-5 h-5" />
                     <span>6</span>
                 </div>
-                <div className="flex items-center space-x-1 bg-gray-200 p-1 rounded-full">
-                <img src={ShareIcon} alt="Share" className="w-5 h-5" />
+                <div className="flex items-center space-x-1 bg-gray-200 p-1 rounded-full cursor-pointer" onClick={handleShare}>
+                    <img src={ShareIcon} alt="Share" className="w-5 h-5" />
                     <span>Share</span>
                 </div>
             </div>
