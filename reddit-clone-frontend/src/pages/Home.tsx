@@ -1,4 +1,5 @@
 import PostCard from "../components/PostCard";
+import randomImage from "../assets/random.png";
 
 const dummyPosts = [
     {
@@ -19,11 +20,21 @@ const dummyPosts = [
         createdAt: "5 hours ago",
         body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
     },
+    {
+        id: "3",
+        title: "Another nother' one",
+        author: "user4526",
+        score: 87,
+        comments: 12,
+        createdAt: "5 hours ago",
+        body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+        imageUrl: randomImage,  
+    },
 ];
 
 export default function Home() {
     return (
-        <div className="space-y-4 bg-gray-100 min-h-screen p-4">
+        <div className="space-y-4 bg-white min-h-screen p-2">
             {dummyPosts.map((post) => (
                 <PostCard key={post.id} {...post} />
             ))}
