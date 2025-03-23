@@ -4,6 +4,7 @@ import {
     getCommentsByPost,
     updateComment,
     deleteComment,
+    getCommentsByUser,
 } from "./commentController";
 import { protect } from "../middleware/authMiddleware"; // or wherever your auth middleware lives
 
@@ -16,5 +17,6 @@ router.get("/post/:postId", getCommentsByPost);
 router.post("/", protect, createComment);
 router.patch("/:commentId", protect, updateComment);
 router.delete("/:commentId", protect, deleteComment);
+router.get("/", protect, getCommentsByUser);
 
 export default router;

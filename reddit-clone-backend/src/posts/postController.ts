@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import Post from "../posts/postSchema";
 import { z } from "zod";
 import {
     getAllPostsService,
@@ -191,5 +192,17 @@ export const deletePost = async (
             message,
             error: error instanceof Error ? error.message : "Unknown error",
         });
+    }
+};
+
+export const getPostsByUser = async (req: Request, res: Response): Promise<void> => {
+    const { authorId } = req.query;
+
+    try {
+        const posts = await Post.find({ author: authorId })
+                                .sort({ createdAt: -1 });
+        res.status(200).json(posts);
+    } catch (error) {
+        res.status(500).json({ message: (error as Error).message });
     }
 };

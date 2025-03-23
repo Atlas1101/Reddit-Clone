@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { z } from "zod";
+import Comment from "../comments/commentSchema";
 import {
     createCommentService,
     getCommentsByPostService,
@@ -168,6 +169,25 @@ export const deleteComment = async (
             message,
             error: error instanceof Error ? error.message : "Unknown error",
         });
+    }
+};
+
+// 📌 GET COMMENTS BY ID
+export const getCommentsByUser = async (req: Request, res: Response): Promise<void> => {
+    const { authorId } = req.query;
+
+    try {
+        const comments = await Comment.find({ author: authorId })
+                                      .sort({ createdAt: -1 });
+
+        if (comments.length === 0) {
+            res.status(404).json({ message: "No comments found for this user" });
+            return;
+        }
+
+        res.status(200).json(comments);
+    } catch (error) {
+        res.status(500).json({ message: (error as Error).message });
     }
 };
 

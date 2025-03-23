@@ -5,6 +5,8 @@ import {
     createPost,
     updatePost,
     deletePost,
+    getPostsByUser,
+    
 } from "../posts/postController";
 import { protect } from "../middleware/authMiddleware"; // adjust path if needed
 
@@ -18,5 +20,5 @@ router.get("/:id", getPostById);
 router.post("/", protect, createPost);
 router.put("/:id", protect, updatePost);
 router.delete("/:id", protect, deletePost);
-
+router.get("/", protect, getPostsByUser);
 export default router;
