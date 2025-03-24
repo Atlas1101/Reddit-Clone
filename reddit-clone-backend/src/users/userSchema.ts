@@ -7,7 +7,8 @@ export interface IUser extends mongoose.Document {
     username: string;
     email: string;
     password: string;
-    karma: number; // ✅ added karma
+    karma: number;
+    subscribedCommunities: mongoose.Types.ObjectId[]; // Add subscribed communities
     comparePassword: (password: string) => Promise<boolean>;
     generateAuthToken: () => string;
 }
@@ -17,7 +18,8 @@ const UserSchema = new mongoose.Schema<IUser>(
         username: { type: String, required: true, unique: true },
         email: { type: String, required: true, unique: true },
         password: { type: String, required: true },
-        karma: { type: Number, default: 0 }, // ✅ added karma default
+        karma: { type: Number, default: 0 },
+        subscribedCommunities: [{ type: mongoose.Types.ObjectId, ref: 'Community' }], // Add field for subscribed communities
     },
     { timestamps: true }
 );
