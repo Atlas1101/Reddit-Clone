@@ -10,6 +10,7 @@ import CloseIcon from "../assets/close-icon.svg";
 import HideIcon from "../assets/hide-icon.svg";
 import ReportIcon from "../assets/report-icon.svg";
 import SaveIcon from "../assets/save-icon.svg";
+import { useAuthModal } from '../context/AuthModalContext';
 
 type PostProps = {
     id: string;
@@ -51,30 +52,36 @@ export default function PostCard({
         setIsOptionsOpen(!isOptionsOpen);
     };
 
+    const { setShowLogin } = useAuthModal();
+    const isLoggedIn = false; // Replace with actual auth check
+
+    const handleProtectedAction = (action: () => void) => {
+        if (!isLoggedIn) {
+            setShowLogin(true);
+            return;
+        }
+        action();
+    };
+
     const toggleUpvote = () => {
-        setIsUpvoted(!isUpvoted);
-        if (isDownvoted) setIsDownvoted(false); // Reset downvote if upvoted
+        handleProtectedAction(() => {
+            setIsUpvoted(!isUpvoted);
+            if (isDownvoted) setIsDownvoted(false);
+        });
     };
 
     const toggleDownvote = () => {
-        setIsDownvoted(!isDownvoted);
-        if (isUpvoted) setIsUpvoted(false); // Reset upvote if downvoted
+        handleProtectedAction(() => {
+            setIsDownvoted(!isDownvoted);
+            if (isUpvoted) setIsUpvoted(false);
+        });
     };
 
-    const handleShare = () => {
-        console.log('Share button pressed'); // Debugging log
-        if (navigator.share) {
-            navigator.share({
-                title: `Check out this post on r/${subreddit}`,
-                text: title,
-                url: window.location.href, // Use the current URL or a specific post URL
-            })
-            .then(() => console.log('Successful share'))
-            .catch((error) => console.log('Error sharing', error));
-        } else {
-            console.log('Web Share API is not supported in your browser.'); // Debugging log
-            alert('Web Share API is not supported in your browser.');
-        }
+    const handleJoinCommunity = () => {
+        handleProtectedAction(() => {
+            // Join community logic here
+            console.log('Joining community');
+        });
     };
 
     return (
@@ -211,7 +218,10 @@ export default function PostCard({
                     <img src={AwardIcon} alt="Award" className="w-5 h-5" />
                     <span>6</span>
                 </div>
-                <div className="flex items-center space-x-1 bg-gray-200 p-1 rounded-full cursor-pointer" onClick={handleShare}>
+                <div className="flex items-center space-x-1 bg-gray-200 p-1 rounded-full cursor-pointer" onClick={() => {
+                    // Handle share functionality
+                    console.log('Share clicked');
+                }}>
                     <img src={ShareIcon} alt="Share" className="w-5 h-5" />
                     <span>Share</span>
                 </div>

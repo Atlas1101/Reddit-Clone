@@ -1,11 +1,13 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
+import { useAuthModal } from '../context/AuthModalContext';
 
 export default function Navbar() {
     const [showSidebar, setShowSidebar] = useState(false);
     const [animateOut, setAnimateOut] = useState(false);
     const [showMenu, setShowMenu] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
+    const { setShowLogin } = useAuthModal();
 
     const handleCloseSidebar = () => {
         setAnimateOut(true);
@@ -67,7 +69,10 @@ export default function Navbar() {
                         <span className="text-xl font-light">＋</span>
                         <span className="text-sm font-medium">Create</span>
                     </Link>
-                    <button className="bg-orange-600 text-white text-sm rounded-full px-4 py-1 font-semibold hover:bg-orange-700">
+                    <button 
+                        onClick={() => setShowLogin(true)}
+                        className="bg-orange-600 text-white text-sm rounded-full px-4 py-1 font-semibold hover:bg-orange-700"
+                    >
                         Log In
                     </button>
                     <button
