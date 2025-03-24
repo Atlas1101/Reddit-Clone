@@ -28,7 +28,8 @@ export default function PostPage() {
         id: id,
         title: "Example Post Title",
         author: "user123",
-        content: "This is the full content of the post. It can be quite long and contain multiple paragraphs.",
+        content:
+            "This is the full content of the post. It can be quite long and contain multiple paragraphs.",
         score: 42,
         createdAt: "2 hours ago",
         subreddit: "exampleSub",
@@ -71,8 +72,16 @@ export default function PostPage() {
         setCommentText("");
     };
 
-    const CommentComponent = ({ comment, depth = 0 }: { comment: Comment; depth?: number }) => {
-        const [isCollapsed, setIsCollapsed] = useState(comment.isCollapsed || false);
+    const CommentComponent = ({
+        comment,
+        depth = 0,
+    }: {
+        comment: Comment;
+        depth?: number;
+    }) => {
+        const [isCollapsed, setIsCollapsed] = useState(
+            comment.isCollapsed || false
+        );
 
         const toggleCollapse = () => {
             setIsCollapsed(!isCollapsed);
@@ -80,46 +89,75 @@ export default function PostPage() {
 
         return (
             <div className={`ml-${depth * 4}`}>
-            <div className="bg-white rounded p-3 mb-2 border border-gray-200">
-                <div className="flex items-center space-x-2 text-sm text-gray-500">
-                    {comment.replies && comment.replies.length > 0 && (
-                        <button
-                            onClick={toggleCollapse}
-                            className="text-gray-500 hover:text-gray-700 focus:outline-none"
-                        >
-                            {isCollapsed ? '[+]' : '[-]'}
-                        </button>
-                    )}
-                    <span className="font-semibold text-gray-700">{comment.author}</span>
-                    <span>•</span>
-                    <span>{comment.createdAt}</span>
-                </div>
-                <p className="my-2">{comment.content}</p>
-                <div className="flex items-center space-x-4 text-sm">
-                    <div className="flex items-center space-x-1">
-                        <button 
-                            onClick={toggleUpvote}
-                            className={`hover:bg-gray-100 rounded ${isUpvoted ? 'text-orange-500' : ''}`}
-                        >
-                            <img src={UpvoteIcon} alt="Upvote" className="w-4 h-4" />
-                        </button>
-                        <span className={`${isUpvoted ? 'text-orange-500' : isDownvoted ? 'text-blue-500' : ''}`}>
-                            {comment.score}
+                <div className="bg-white rounded p-3 mb-2 border border-gray-200">
+                    <div className="flex items-center space-x-2 text-sm text-gray-500">
+                        {comment.replies && comment.replies.length > 0 && (
+                            <button
+                                onClick={toggleCollapse}
+                                className="text-gray-500 hover:text-gray-700 focus:outline-none"
+                            >
+                                {isCollapsed ? "[+]" : "[-]"}
+                            </button>
+                        )}
+                        <span className="font-semibold text-gray-700">
+                            {comment.author}
                         </span>
-                        <button 
-                            onClick={toggleDownvote}
-                            className={`hover:bg-gray-100 rounded ${isDownvoted ? 'text-blue-500' : ''}`}
-                        >
-                            <img src={DownvoteIcon} alt="Downvote" className="w-4 h-4" />
+                        <span>•</span>
+                        <span>{comment.createdAt}</span>
+                    </div>
+                    <p className="my-2">{comment.content}</p>
+                    <div className="flex items-center space-x-4 text-sm">
+                        <div className="flex items-center space-x-1">
+                            <button
+                                onClick={toggleUpvote}
+                                className={`hover:bg-gray-100 rounded ${
+                                    isUpvoted ? "text-orange-500" : ""
+                                }`}
+                            >
+                                <img
+                                    src={UpvoteIcon}
+                                    alt="Upvote"
+                                    className="w-4 h-4"
+                                />
+                            </button>
+                            <span
+                                className={`${
+                                    isUpvoted
+                                        ? "text-orange-500"
+                                        : isDownvoted
+                                        ? "text-blue-500"
+                                        : ""
+                                }`}
+                            >
+                                {comment.score}
+                            </span>
+                            <button
+                                onClick={toggleDownvote}
+                                className={`hover:bg-gray-100 rounded ${
+                                    isDownvoted ? "text-blue-500" : ""
+                                }`}
+                            >
+                                <img
+                                    src={DownvoteIcon}
+                                    alt="Downvote"
+                                    className="w-4 h-4"
+                                />
+                            </button>
+                        </div>
+                        <button className="text-gray-500 hover:text-gray-700">
+                            Reply
                         </button>
                     </div>
-                    <button className="text-gray-500 hover:text-gray-700">Reply</button>
                 </div>
+                {!isCollapsed &&
+                    comment.replies?.map((reply) => (
+                        <CommentComponent
+                            key={reply.id}
+                            comment={reply}
+                            depth={depth + 1}
+                        />
+                    ))}
             </div>
-            {!isCollapsed && comment.replies?.map((reply) => (
-                <CommentComponent key={reply.id} comment={reply} depth={depth + 1} />
-            ))}
-        </div>
         );
     };
 
@@ -137,16 +175,30 @@ export default function PostPage() {
                 <div className="flex items-center space-x-4 text-sm">
                     <div className="flex items-center space-x-1 bg-gray-100 rounded-full px-3 py-1">
                         <button onClick={toggleUpvote}>
-                            <img src={UpvoteIcon} alt="Upvote" className="w-5 h-5" />
+                            <img
+                                src={UpvoteIcon}
+                                alt="Upvote"
+                                className="w-5 h-5"
+                            />
                         </button>
                         <span>{post.score}</span>
                         <button onClick={toggleDownvote}>
-                            <img src={DownvoteIcon} alt="Downvote" className="w-5 h-5" />
+                            <img
+                                src={DownvoteIcon}
+                                alt="Downvote"
+                                className="w-5 h-5"
+                            />
                         </button>
                     </div>
                     <div className="flex items-center space-x-1 bg-gray-100 rounded-full px-3 py-1">
-                        <img src={CommentIcon} alt="Comments" className="w-5 h-5" />
-                        {post.commentCount > 0 && <span>{post.commentCount} Comments</span>}
+                        <img
+                            src={CommentIcon}
+                            alt="Comments"
+                            className="w-5 h-5"
+                        />
+                        {post.commentCount > 0 && (
+                            <span>{post.commentCount} Comments</span>
+                        )}
                     </div>
                     <button className="flex items-center space-x-1 bg-gray-100 rounded-full px-3 py-1">
                         <img src={ShareIcon} alt="Share" className="w-5 h-5" />
@@ -160,7 +212,10 @@ export default function PostPage() {
             </div>
 
             {/* Comment Form */}
-            <form onSubmit={handleSubmitComment} className="bg-white rounded-lg shadow p-4 mb-4">
+            <form
+                onSubmit={handleSubmitComment}
+                className="bg-white rounded-lg shadow p-4 mb-4"
+            >
                 <textarea
                     value={commentText}
                     onChange={(e) => setCommentText(e.target.value)}
@@ -186,6 +241,5 @@ export default function PostPage() {
                 ))}
             </div>
         </div>
-        );
-    };
-
+    );
+}

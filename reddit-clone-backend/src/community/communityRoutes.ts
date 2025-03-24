@@ -1,5 +1,5 @@
-import { Router } from 'express';
-import { protect } from '../middleware/authMiddleware';
+import { Router } from "express";
+import { protect } from "../middleware/authMiddleware";
 import {
     createCommunity,
     getCommunityById,
@@ -7,30 +7,34 @@ import {
     deleteCommunity,
     joinCommunity,
     leaveCommunity,
-    addCommunityRule
-} from '../community/communityController';
+    addCommunityRule,
+    getAllCommunities,
+} from "../community/communityController";
 
 const router = Router();
 
 // Create a community
-router.post('/', protect, createCommunity);
+router.post("/", protect, createCommunity);
 
 // Get community by ID
-router.get('/:id', getCommunityById);
+router.get("/:id", getCommunityById);
+
+// GET /api/communities — get all communities for selection
+router.get("/", getAllCommunities);
 
 // Update a community
-router.patch('/:id', protect, updateCommunity);
+router.patch("/:id", protect, updateCommunity);
 
 // Delete a community
-router.delete('/:id', protect, deleteCommunity);
+router.delete("/:id", protect, deleteCommunity);
 
 // Join a community
-router.post('/:id/join', protect, joinCommunity);
+router.post("/:id/join", protect, joinCommunity);
 
 // Leave a community
-router.post('/:id/leave', protect, leaveCommunity);
+router.post("/:id/leave", protect, leaveCommunity);
 
 // Add a community rule
-router.post('/:id/rules', protect, addCommunityRule);
+router.post("/:id/rules", protect, addCommunityRule);
 
 export default router;

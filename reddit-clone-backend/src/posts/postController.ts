@@ -8,6 +8,8 @@ import {
     updatePostService,
     deletePostService,
 } from "../posts/postService";
+import { createPostInputSchema } from "../middleware/validateAuth";
+
 // ✅ Authenticated request type
 interface AuthRequest extends Request {
     user?: { id: string; email: string };
@@ -56,6 +58,7 @@ export const getPostById = async (
 
 // @desc    Create a post
 // @route   POST /api/posts
+
 export const createPost = async (
     req: AuthRequest,
     res: Response
@@ -68,10 +71,38 @@ export const createPost = async (
             return;
         }
 
-        const newPost = await createPostService(
-            req.body,
-            req.user.id.toString()
-        );
+        // extract from body
+        const { title, community, postType, content, linkUrl } = req.body;
+
+        // determine final content
+        let finalContent = content;
+
+        if (postType === "image") {
+            if (!req.file) {
+                res.status(400).json({ message: "Image is required" });
+                return;
+            }
+            finalContent = `/uploads/${req.file.filename}`;
+        }
+
+        if (postType === "link") {
+            if (!linkUrl) {
+                res.status(400).json({ message: "Link is required" });
+                return;
+            }
+            finalContent = linkUrl;
+        }
+
+        // Validate using Zod
+        const parsed = createPostInputSchema.parse({
+            title,
+            postType,
+            community,
+            content: finalContent,
+        });
+
+        // Pass to service
+        const newPost = await createPostService(parsed, req.user.id.toString());
 
         res.status(201).json({ post: newPost, message: "New post created" });
     } catch (error) {
@@ -195,12 +226,16 @@ export const deletePost = async (
     }
 };
 
-export const getPostsByUser = async (req: Request, res: Response): Promise<void> => {
+export const getPostsByUser = async (
+    req: Request,
+    res: Response
+): Promise<void> => {
     const { authorId } = req.query;
 
     try {
-        const posts = await Post.find({ author: authorId })
-                                .sort({ createdAt: -1 });
+        const posts = await Post.find({ author: authorId }).sort({
+            createdAt: -1,
+        });
         res.status(200).json(posts);
     } catch (error) {
         res.status(500).json({ message: (error as Error).message });
