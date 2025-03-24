@@ -6,7 +6,8 @@ import {
     deleteCommunityService,
     joinCommunityService,
     leaveCommunityService,
-    addCommunityRuleService
+    addCommunityRuleService,
+    getAllCommunitiesService,
 } from "../community/communityService";
 
 // Authenticated request type
@@ -15,7 +16,10 @@ interface AuthRequest extends Request {
 }
 
 // Create Community
-export const createCommunity = async (req: AuthRequest, res: Response): Promise<void> => {
+export const createCommunity = async (
+    req: AuthRequest,
+    res: Response
+): Promise<void> => {
     try {
         if (!req.user) {
             res.status(401).json({ message: "Unauthorized" });
@@ -23,7 +27,11 @@ export const createCommunity = async (req: AuthRequest, res: Response): Promise<
         }
 
         const { name, description } = req.body;
-        const community = await createCommunityService(name, description, req.user.id);
+        const community = await createCommunityService(
+            name,
+            description,
+            req.user.id
+        );
         res.status(201).json({ message: "Community created", community });
     } catch (error) {
         res.status(500).json({ message: (error as Error).message });
@@ -31,7 +39,10 @@ export const createCommunity = async (req: AuthRequest, res: Response): Promise<
 };
 
 // Get Community by ID
-export const getCommunityById = async (req: Request, res: Response): Promise<void> => {
+export const getCommunityById = async (
+    req: Request,
+    res: Response
+): Promise<void> => {
     try {
         const community = await getCommunityByIdService(req.params.id);
         if (!community) {
@@ -44,15 +55,34 @@ export const getCommunityById = async (req: Request, res: Response): Promise<voi
     }
 };
 
+export const getAllCommunities = async (
+    req: Request,
+    res: Response
+): Promise<void> => {
+    try {
+        const communities = await getAllCommunitiesService();
+        res.status(200).json(communities);
+    } catch (error) {
+        console.error("Error fetching communities:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
+
 // Join Community
-export const joinCommunity = async (req: AuthRequest, res: Response): Promise<void> => {
+export const joinCommunity = async (
+    req: AuthRequest,
+    res: Response
+): Promise<void> => {
     try {
         if (!req.user) {
             res.status(401).json({ message: "Unauthorized" });
             return;
         }
 
-        const community = await joinCommunityService(req.params.id, req.user.id);
+        const community = await joinCommunityService(
+            req.params.id,
+            req.user.id
+        );
         res.status(200).json({ message: "Joined community", community });
     } catch (error) {
         res.status(500).json({ message: (error as Error).message });
@@ -60,14 +90,20 @@ export const joinCommunity = async (req: AuthRequest, res: Response): Promise<vo
 };
 
 // Leave Community
-export const leaveCommunity = async (req: AuthRequest, res: Response): Promise<void> => {
+export const leaveCommunity = async (
+    req: AuthRequest,
+    res: Response
+): Promise<void> => {
     try {
         if (!req.user) {
             res.status(401).json({ message: "Unauthorized" });
             return;
         }
 
-        const community = await leaveCommunityService(req.params.id, req.user.id);
+        const community = await leaveCommunityService(
+            req.params.id,
+            req.user.id
+        );
         res.status(200).json({ message: "Left community", community });
     } catch (error) {
         res.status(500).json({ message: (error as Error).message });
@@ -75,7 +111,10 @@ export const leaveCommunity = async (req: AuthRequest, res: Response): Promise<v
 };
 
 // Add Community Rule
-export const addCommunityRule = async (req: AuthRequest, res: Response): Promise<void> => {
+export const addCommunityRule = async (
+    req: AuthRequest,
+    res: Response
+): Promise<void> => {
     try {
         if (!req.user) {
             res.status(401).json({ message: "Unauthorized" });
@@ -83,14 +122,21 @@ export const addCommunityRule = async (req: AuthRequest, res: Response): Promise
         }
 
         const { title, description } = req.body;
-        const community = await addCommunityRuleService(req.params.id, req.user.id, { title, description });
+        const community = await addCommunityRuleService(
+            req.params.id,
+            req.user.id,
+            { title, description }
+        );
         res.status(200).json({ message: "Rule added", community });
     } catch (error) {
         res.status(500).json({ message: (error as Error).message });
     }
 };
 
-export const updateCommunity = async (req: AuthRequest, res: Response): Promise<void> => {
+export const updateCommunity = async (
+    req: AuthRequest,
+    res: Response
+): Promise<void> => {
     try {
         if (!req.user) {
             res.status(401).json({ message: "Unauthorized" });
@@ -98,7 +144,11 @@ export const updateCommunity = async (req: AuthRequest, res: Response): Promise<
         }
 
         const { name, description } = req.body;
-        const community = await updateCommunityService(req.params.id, req.user.id, { name, description });
+        const community = await updateCommunityService(
+            req.params.id,
+            req.user.id,
+            { name, description }
+        );
 
         if (!community) {
             res.status(404).json({ message: "Community not found" });
@@ -111,7 +161,10 @@ export const updateCommunity = async (req: AuthRequest, res: Response): Promise<
     }
 };
 
-export const deleteCommunity = async (req: AuthRequest, res: Response): Promise<void> => {
+export const deleteCommunity = async (
+    req: AuthRequest,
+    res: Response
+): Promise<void> => {
     try {
         if (!req.user) {
             res.status(401).json({ message: "Unauthorized" });

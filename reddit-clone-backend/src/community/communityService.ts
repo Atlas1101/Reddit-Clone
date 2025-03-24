@@ -29,6 +29,10 @@ export const getCommunityByIdService = async (
         .populate("members", "username");
 };
 
+export const getAllCommunitiesService = async () => {
+    return Community.find().select("name members icon");
+};
+
 // Update community
 export const updateCommunityService = async (
     communityId: string,
