@@ -16,7 +16,9 @@ export const getLoggedInUser = async (req: AuthRequest, res: Response): Promise<
             return;
         }
 
-        const user = await User.findById(req.user.id).select("-password");
+        const user = await User.findById(req.user.id)
+            .select("-password")
+            .populate('subscribedCommunities'); // Populate the subscribedCommunities
 
         if (!user) {
             res.status(404).json({ message: "User not found" });

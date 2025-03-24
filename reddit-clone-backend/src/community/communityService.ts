@@ -1,5 +1,6 @@
 import Community, { ICommunity } from "./communitySchema";
 import mongoose from "mongoose";
+import User from "../users/userSchema"; // Add this import
 
 // Create community
 export const createCommunityService = async (
@@ -16,6 +17,13 @@ export const createCommunityService = async (
     });
 
     await community.save();
+    
+    // Update the user's subscribedCommunities array
+    await User.findByIdAndUpdate(
+        userId,
+        { $addToSet: { subscribedCommunities: community._id } }
+    );
+    
     return community;
 };
 
