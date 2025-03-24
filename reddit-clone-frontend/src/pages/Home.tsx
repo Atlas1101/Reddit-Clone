@@ -1,42 +1,52 @@
+import { useState } from "react";
 import PostCard from "../components/PostCard";
-import randomImage from "../assets/random.jpg";
 
-const dummyPosts = [
-    {
-        id: "1",
-        title: "First Post",
-        author: "user123",
-        score: 23,
-        comments: 5,
-        createdAt: "2 hours ago",
-        body: "This is the body of the first post...",
-    },
-    {
-        id: "2",
-        title: "Another one",
-        author: "user456",
-        score: 87,
-        comments: 12,
-        createdAt: "5 hours ago",
-        body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    },
-    {
-        id: "3",
-        title: "Another nother' one",
-        author: "user4526",
-        score: 87,
-        comments: 12,
-        createdAt: "5 hours ago",
-        body: "",
-        imageUrl: randomImage,  
-    },
-];
+// Define the Post interface
+interface Post {
+    id: string;
+    title: string;
+    author: string;
+    score: number;
+    content: string;
+    createdAt: string;
+    commentCount: number;
+}
 
 export default function Home() {
+    // Mock data for posts
+    const mockPosts: Post[] = [
+        {
+            id: "1",
+            title: "First Post Example",
+            author: "user123",
+            score: 42,
+            content: "This is an example post content",
+            createdAt: "2 hours ago",
+            commentCount: 5
+        },
+        {
+            id: "2",
+            title: "Second Post Example",
+            author: "user456",
+            score: 28,
+            content: "Another example post content",
+            createdAt: "4 hours ago",
+            commentCount: 3
+        }
+    ];
+
     return (
         <div className="space-y-4 bg-white min-h-screen p-2">
-            {dummyPosts.map((post) => (
-                <PostCard key={post.id} {...post} />
+            {mockPosts.map((post) => (
+                <PostCard
+                    key={post.id}
+                    id={post.id}
+                    title={post.title}
+                    author={post.author}
+                    score={post.score}
+                    createdAt={post.createdAt}
+                    commentCount={post.commentCount}
+                />
             ))}
         </div>
     );
