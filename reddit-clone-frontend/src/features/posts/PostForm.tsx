@@ -22,7 +22,7 @@ export default function PostForm() {
 
     const subreddits = [
         {
-            name: "announcements",
+            name: "WebDev",
             members: 305157802,
             icon: "https://styles.redditmedia.com/t5_2qh3s/styles/communityIcon_tijokm0tx3d41.png",
         },
@@ -38,6 +38,57 @@ export default function PostForm() {
         },
         // ...add more
     ];
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        if (!selectedSubreddit) {
+            alert("Please select a subreddit.");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("title", title);
+        formData.append("postType", postType);
+        formData.append("community", selectedSubreddit);
+
+        if (postType === "text") {
+            formData.append("content", body);
+        }
+
+        if (postType === "image" && image) {
+            formData.append("image", image); // this goes to req.file
+        }
+
+        if (postType === "link") {
+            formData.append("linkUrl", linkUrl);
+            formData.append("content", linkUrl); // backend expects "content"
+        }
+
+        try {
+            const res = await fetch("http://localhost:5000/api/posts", {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${
+                        localStorage.getItem("token") || ""
+                    }`,
+                },
+                body: formData,
+            });
+
+            if (!res.ok) {
+                const data = await res.json();
+                alert(data.message || "Failed to create post.");
+                return;
+            }
+
+            const data = await res.json();
+            console.log("✅ Post created:", data);
+            // redirect, clear form, or show success UI
+        } catch (err) {
+            console.error("Error submitting post:", err);
+            alert("Something went wrong.");
+        }
+    };
 
     return (
         <div className="max-w-2xl mx-auto p-4">
@@ -51,25 +102,6 @@ export default function PostForm() {
 
             {/* Subreddit selector */}
             <div className="relative mb-4">
-                {/* <button
-                    type="button"
-                    onClick={() => setShowDropdown((prev) => !prev)}
-                    className="flex items-center justify-between w-full border px-4 py-2 rounded text-sm hover:border-blue-500"
-                >
-                    <span className="flex items-center space-x-2">
-                        <img
-                            src="https://www.redditstatic.com/avatars/defaults/v2/avatar_default_1.png"
-                            className="w-5 h-5 rounded-full"
-                        />
-                        <span>
-                            {selectedSubreddit
-                                ? `r/${selectedSubreddit}`
-                                : "Select a community"}
-                        </span>
-                    </span>
-                    <span>⌄</span>
-                </button> */}
-
                 {/* Dropdown */}
                 <div className="relative mb-4 w-80" ref={dropdownRef}>
                     <button
@@ -164,7 +196,7 @@ export default function PostForm() {
             </div>
 
             {/* Post type-specific fields */}
-            <form className="space-y-4">
+            <form className="space-y-4" onSubmit={handleSubmit}>
                 {/* Title */}
                 <div>
                     <input
@@ -198,23 +230,33 @@ export default function PostForm() {
                         className="w-full border rounded px-4 py-2 text-sm"
                     />
                 )}
-
                 {postType === "image" && (
-                    <label
-                        htmlFor="fileInput"
-                        className="relative border border-dashed rounded h-40 flex items-center justify-center text-gray-400 text-sm cursor-pointer hover:bg-gray-50"
-                    >
-                        Drag and Drop or upload media
-                        <input
-                            id="fileInput"
-                            type="file"
-                            accept="image/*,video/*"
-                            onChange={(e) =>
-                                setImage(e.target.files?.[0] || null)
-                            }
-                            className="absolute inset-0 opacity-0 cursor-pointer"
-                        />
-                    </label>
+                    <div className="space-y-2">
+                        <label
+                            htmlFor="fileInput"
+                            className="relative border border-dashed rounded h-40 flex items-center justify-center text-gray-400 text-sm cursor-pointer hover:bg-gray-50"
+                        >
+                            Drag and Drop or upload media
+                            <input
+                                id="fileInput"
+                                type="file"
+                                accept="image/*,video/*"
+                                onChange={(e) =>
+                                    setImage(e.target.files?.[0] || null)
+                                }
+                                className="absolute inset-0 opacity-0 cursor-pointer"
+                            />
+                        </label>
+
+                        {/* 👇 Preview only if an image is selected */}
+                        {image && (
+                            <img
+                                src={URL.createObjectURL(image)}
+                                alt="Preview"
+                                className="w-full max-h-64 object-contain rounded border"
+                            />
+                        )}
+                    </div>
                 )}
 
                 {postType === "link" && (

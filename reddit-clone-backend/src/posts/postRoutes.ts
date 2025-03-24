@@ -6,9 +6,9 @@ import {
     updatePost,
     deletePost,
     getPostsByUser,
-    
 } from "../posts/postController";
-import { protect } from "../middleware/authMiddleware"; // adjust path if needed
+import { protect } from "../middleware/authMiddleware";
+import { upload } from "../middleware/upload"; // ✅ multer middleware
 
 const router = express.Router();
 
@@ -17,8 +17,9 @@ router.get("/", getAllPosts);
 router.get("/:id", getPostById);
 
 // Protected
-router.post("/", protect, createPost);
+router.post("/", protect, upload.single("image"), createPost); // ✅ updated
 router.put("/:id", protect, updatePost);
 router.delete("/:id", protect, deletePost);
-router.get("/", protect, getPostsByUser);
+router.get("/user/me", protect, getPostsByUser); // ✅ moved to avoid route conflict
+
 export default router;
