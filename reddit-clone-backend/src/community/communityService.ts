@@ -1,29 +1,44 @@
 import Community, { ICommunity } from "./communitySchema";
 import mongoose from "mongoose";
-import User from "../users/userSchema"; // Add this import
+import User from "../users/userSchema";
+import { createCommunitySchema } from "../middleware/validateAuth"; // adjust path if needed
+
+interface CreateCommunityInput {
+    name: string;
+    description?: string;
+    icon?: string;
+    rules?: {
+        title: string;
+        description: string;
+    }[];
+}
 
 // Create community
 export const createCommunityService = async (
-    name: string,
-    description: string,
+    body: unknown,
     userId: string
 ): Promise<ICommunity> => {
+    // Zod validation inline
+    const { name, description, icon, rules } =
+        createCommunitySchema.parse(body);
+
     const community = new Community({
         name,
         description,
+        icon,
+        rules: rules || [],
         createdBy: userId,
         moderators: [userId],
         members: [userId],
     });
 
     await community.save();
-    
-    // Update the user's subscribedCommunities array
-    await User.findByIdAndUpdate(
-        userId,
-        { $addToSet: { subscribedCommunities: community._id } }
-    );
-    
+
+    // Add this community to the user's subscriptions
+    await User.findByIdAndUpdate(userId, {
+        $addToSet: { subscribedCommunities: community._id },
+    });
+
     return community;
 };
 
@@ -45,8 +60,11 @@ export const getAllCommunitiesService = async () => {
 export const updateCommunityService = async (
     communityId: string,
     userId: string,
-    updateData: Partial<ICommunity>
+    body: unknown
 ): Promise<ICommunity | null> => {
+    // Zod inline validation — all fields optional
+    const validatedData = createCommunitySchema.partial().parse(body);
+
     const community = await Community.findOne({
         _id: communityId,
         moderators: userId,
@@ -56,7 +74,7 @@ export const updateCommunityService = async (
         throw new Error("Community not found or unauthorized");
     }
 
-    Object.assign(community, updateData);
+    Object.assign(community, validatedData);
     await community.save();
 
     return community;

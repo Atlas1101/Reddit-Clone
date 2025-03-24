@@ -10,6 +10,8 @@ import {
     getAllCommunitiesService,
 } from "../community/communityService";
 
+import { createCommunitySchema } from "../middleware/validateAuth"; // adjust path as needed
+
 // Authenticated request type
 interface AuthRequest extends Request {
     user?: { id: string; email: string };
@@ -26,12 +28,8 @@ export const createCommunity = async (
             return;
         }
 
-        const { name, description } = req.body;
-        const community = await createCommunityService(
-            name,
-            description,
-            req.user.id
-        );
+        const community = await createCommunityService(req.body, req.user.id);
+
         res.status(201).json({ message: "Community created", community });
     } catch (error) {
         res.status(500).json({ message: (error as Error).message });
@@ -143,11 +141,10 @@ export const updateCommunity = async (
             return;
         }
 
-        const { name, description } = req.body;
         const community = await updateCommunityService(
             req.params.id,
             req.user.id,
-            { name, description }
+            req.body
         );
 
         if (!community) {

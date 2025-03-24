@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRef } from "react";
 import useClickOutside from "../../hooks/useClickOutside";
 
@@ -20,24 +20,38 @@ export default function PostForm() {
     const dropdownRef = useRef<HTMLDivElement>(null);
     useClickOutside(dropdownRef, () => setShowDropdown(false));
 
-    const subreddits = [
-        {
-            name: "WebDev",
-            members: 305157802,
-            icon: "https://styles.redditmedia.com/t5_2qh3s/styles/communityIcon_tijokm0tx3d41.png",
-        },
-        {
-            name: "chessclub",
-            members: 2558,
-            icon: "https://styles.redditmedia.com/t5_2sjrp/styles/communityIcon_pfsgrrzpuyf41.png",
-        },
-        {
-            name: "goodboomerhumor",
-            members: 165440,
-            icon: "https://styles.redditmedia.com/t5_4z6ft1/styles/communityIcon_u6li00gh0btb1.png",
-        },
-        // ...add more
-    ];
+    const [subreddits, setSubreddits] = useState<
+        { _id: string; name: string; icon: string; memberCount: number }[]
+    >([]);
+
+    useEffect(() => {
+        const fetchCommunities = async () => {
+            try {
+                const token = localStorage.getItem("token");
+                const res = await fetch(
+                    "http://localhost:5000/api/users/me/communities",
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    }
+                );
+
+                if (!res.ok) {
+                    throw new Error("Failed to load communities");
+                }
+
+                const data = await res.json();
+
+                setSubreddits(data);
+            } catch (err) {
+                console.error("Error loading communities:", err);
+            }
+        };
+
+        fetchCommunities();
+    }, []);
+
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 

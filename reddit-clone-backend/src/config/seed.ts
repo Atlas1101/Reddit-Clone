@@ -47,7 +47,8 @@ const seedDatabase = async () => {
             {
                 name: "WebDev",
                 description: "A community for web developers.",
-                createdBy: john._id, // Use john's ID
+                icon: "https://example.com/icons/webdev.png", // add your actual icon URL or path
+                createdBy: john._id,
                 moderators: [john._id],
                 members: [john._id, jane._id],
                 rules: [
@@ -64,7 +65,8 @@ const seedDatabase = async () => {
             {
                 name: "ReactJS",
                 description: "All about React and related libraries.",
-                createdBy: jane._id, // Use jane's ID
+                icon: "https://example.com/icons/reactjs.png", // add your actual icon URL or path
+                createdBy: jane._id,
                 moderators: [jane._id],
                 members: [john._id, jane._id],
                 rules: [
@@ -79,12 +81,17 @@ const seedDatabase = async () => {
                 ],
             },
         ]);
+
         console.log("🌐 Communities seeded.");
 
         // Update users with subscribed communities
         await User.updateMany(
             { _id: { $in: [john._id, jane._id] } },
-            { $addToSet: { subscribedCommunities: { $each: [webDev._id, reactJS._id] } } }
+            {
+                $addToSet: {
+                    subscribedCommunities: { $each: [webDev._id, reactJS._id] },
+                },
+            }
         );
 
         // Posts

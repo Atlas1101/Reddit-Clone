@@ -8,7 +8,8 @@ interface CommunityRule {
 
 export interface ICommunity extends mongoose.Document {
     name: string;
-    description: string;
+    description?: string;
+    icon?: string;
     createdBy: mongoose.Types.ObjectId;
     moderators: mongoose.Types.ObjectId[];
     members: mongoose.Types.ObjectId[];
@@ -26,11 +27,16 @@ const CommunityRuleSchema = new mongoose.Schema<CommunityRule>({
 const CommunitySchema = new mongoose.Schema<ICommunity>(
     {
         name: { type: String, required: true, unique: true },
-        description: { type: String, required: true },
-        createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+        description: { type: String },
+        icon: { type: String },
+        createdBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            required: true,
+        },
         moderators: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-        members: [{ type: mongoose.Types.ObjectId, ref: 'User' }],
-        rules: [CommunityRuleSchema], 
+        members: [{ type: mongoose.Types.ObjectId, ref: "User" }],
+        rules: [CommunityRuleSchema],
     },
     { timestamps: true }
 );

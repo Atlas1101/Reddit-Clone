@@ -42,6 +42,18 @@ export const commentSchema = createCommentInputSchema.extend({
     author: objectIdSchema,
 });
 
+export const communityRuleSchema = z.object({
+    title: z.string().min(1),
+    description: z.string().min(1),
+});
+
+export const createCommunitySchema = z.object({
+    name: z.string().min(3).max(100),
+    description: z.string().optional(),
+    icon: z.string().url().optional(),
+    rules: z.array(communityRuleSchema).optional(),
+});
+
 // ✅ Type Inference for TypeScript
 export type UserRegisterInput = z.infer<typeof userRegisterSchema>;
 export type UserLoginInput = z.infer<typeof userLoginSchema>;
@@ -52,6 +64,7 @@ export type PostSchemaType = z.infer<typeof postSchema>;
 export type CreateCommentInput = z.infer<typeof createCommentInputSchema>;
 export type CommentInput = z.infer<typeof commentSchema>;
 
+export type CreateCommunityInput = z.infer<typeof createCommunitySchema>;
 // import { z } from "zod";
 
 // // Helper function to validate MongoDB ObjectId
