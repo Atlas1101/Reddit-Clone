@@ -29,7 +29,7 @@ const CommunitySchema = new mongoose.Schema<ICommunity>(
         description: { type: String, required: true },
         createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
         moderators: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-        members: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+        members: [{ type: mongoose.Types.ObjectId, ref: 'User' }],
         rules: [CommunityRuleSchema], 
     },
     { timestamps: true }

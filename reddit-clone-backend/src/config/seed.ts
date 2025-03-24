@@ -30,12 +30,14 @@ const seedDatabase = async () => {
                 email: "john@example.com",
                 password: await bcrypt.hash("password123", 10),
                 karma: 100,
+                subscribedCommunities: [], // Initialize empty array
             },
             {
                 username: "jane_doe",
                 email: "jane@example.com",
                 password: await bcrypt.hash("password123", 10),
                 karma: 50,
+                subscribedCommunities: [], // Initialize empty array
             },
         ]);
         console.log("👤 Users seeded.");
@@ -45,7 +47,7 @@ const seedDatabase = async () => {
             {
                 name: "WebDev",
                 description: "A community for web developers.",
-                createdBy: john._id,
+                createdBy: john._id, // Use john's ID
                 moderators: [john._id],
                 members: [john._id, jane._id],
                 rules: [
@@ -62,7 +64,7 @@ const seedDatabase = async () => {
             {
                 name: "ReactJS",
                 description: "All about React and related libraries.",
-                createdBy: jane._id,
+                createdBy: jane._id, // Use jane's ID
                 moderators: [jane._id],
                 members: [john._id, jane._id],
                 rules: [
@@ -79,13 +81,19 @@ const seedDatabase = async () => {
         ]);
         console.log("🌐 Communities seeded.");
 
+        // Update users with subscribed communities
+        await User.updateMany(
+            { _id: { $in: [john._id, jane._id] } },
+            { $addToSet: { subscribedCommunities: { $each: [webDev._id, reactJS._id] } } }
+        );
+
         // Posts
         const [post1, post2] = await Post.insertMany([
             {
                 title: "Welcome to WebDev!",
                 content: "Introduce yourself here.",
                 author: john._id,
-                community: webDev.name,
+                community: webDev._id,
                 postType: "text",
                 commentCount: 2,
             },
@@ -93,7 +101,7 @@ const seedDatabase = async () => {
                 title: "ReactJS Tips",
                 content: "Use hooks wisely!",
                 author: jane._id,
-                community: reactJS.name,
+                community: reactJS._id,
                 postType: "text",
                 commentCount: 1,
             },
