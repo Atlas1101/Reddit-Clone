@@ -13,9 +13,12 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import AppRouter from "./router";
 import "./index.css";
+import { AuthModalProvider } from "./context/AuthModalContext";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
-        <AppRouter />
+        <AuthModalProvider>
+            <AppRouter />
+        </AuthModalProvider>
     </React.StrictMode>
 );

@@ -34,7 +34,7 @@ const dummyPosts = [
 
 export default function Home() {
     return (
-        <div className="space-y-4 bg-white min-h-screen p-2">
+        <div className="space-y-4">
             {dummyPosts.map((post) => (
                 <PostCard key={post.id} {...post} />
             ))}
