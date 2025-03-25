@@ -96,15 +96,24 @@ export const deleteCommunityService = async (
 };
 
 // Join community
+
 export const joinCommunityService = async (
     communityId: string,
     userId: string
 ): Promise<ICommunity | null> => {
-    return await Community.findByIdAndUpdate(
+    // Add user to community
+    const community = await Community.findByIdAndUpdate(
         communityId,
         { $addToSet: { members: userId } },
         { new: true }
     );
+
+    // Add community to user's subscribedCommunities
+    await User.findByIdAndUpdate(userId, {
+        $addToSet: { subscribedCommunities: communityId },
+    });
+
+    return community;
 };
 
 // Leave community

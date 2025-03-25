@@ -15,16 +15,15 @@ export default function useUserCommunities() {
     useEffect(() => {
         const fetchCommunities = async () => {
             try {
-                const token = localStorage.getItem("token");
                 const res = await fetch(
                     "http://localhost:5000/api/users/me/communities",
                     {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
+                        credentials: "include", // ✅ this sends the cookie!
                     }
                 );
+
                 if (!res.ok) throw new Error("Failed to load communities");
+
                 const data = await res.json();
                 setSubreddits(data);
             } catch (err) {

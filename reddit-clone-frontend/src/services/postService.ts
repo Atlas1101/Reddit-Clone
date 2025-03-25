@@ -1,11 +1,7 @@
 export async function createPost(formData: FormData): Promise<any> {
-    const token = localStorage.getItem("token");
-
     const res = await fetch("http://localhost:5000/api/posts", {
         method: "POST",
-        headers: {
-            Authorization: `Bearer ${token || ""}`,
-        },
+        credentials: "include", // 🔥 send the cookie
         body: formData,
     });
 

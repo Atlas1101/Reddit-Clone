@@ -10,7 +10,7 @@ import CloseIcon from "../assets/close-icon.svg";
 import HideIcon from "../assets/hide-icon.svg";
 import ReportIcon from "../assets/report-icon.svg";
 import SaveIcon from "../assets/save-icon.svg";
-import { useAuthModal } from '../context/AuthModalContext';
+import { useAuthModal } from "../context/AuthModalContext";
 
 type PostProps = {
     id: string;
@@ -39,6 +39,8 @@ export default function PostCard({
     const [isOptionsOpen, setIsOptionsOpen] = useState(false);
     const [isUpvoted, setIsUpvoted] = useState(false); // State for upvote
     const [isDownvoted, setIsDownvoted] = useState(false); // State for downvote
+
+    console.log("PostCard imageUrl:", imageUrl);
 
     const handleImageClick = () => {
         setIsModalOpen(true);
@@ -80,13 +82,12 @@ export default function PostCard({
     const handleJoinCommunity = () => {
         handleProtectedAction(() => {
             // Join community logic here
-            console.log('Joining community');
+            console.log("Joining community");
         });
     };
 
     return (
         <div className="bg-white shadow text-black space-y-1">
-
             {/* Subreddit + time + join */}
             <div className="flex items-center justify-between text-xs text-gray-500">
                 <div className="flex items-center space-x-2">
@@ -127,21 +128,40 @@ export default function PostCard({
                     <div className="absolute bottom-0 left-0 w-full bg-white flex flex-col shadow-lg rounded-t-2xl  ">
                         <div className="flex justify-between items-center p-4 border-b">
                             <span className="font-bold p-2">Options</span>
-                            <button onClick={toggleOptions} className="text-gray-600">
-                                <img src={CloseIcon} alt="Close" className="w-4 h-4" />
+                            <button
+                                onClick={toggleOptions}
+                                className="text-gray-600"
+                            >
+                                <img
+                                    src={CloseIcon}
+                                    alt="Close"
+                                    className="w-4 h-4"
+                                />
                             </button>
                         </div>
                         <div className="p-4 text-sm ">
                             <div className="flex items-center space-x-2 hover:bg-gray-100 p-2 rounded ">
-                                <img src={SaveIcon} alt="Save" className="w-5 h-5" />
+                                <img
+                                    src={SaveIcon}
+                                    alt="Save"
+                                    className="w-5 h-5"
+                                />
                                 <span>Save</span>
                             </div>
                             <div className="flex items-center space-x-2 hover:bg-gray-100 p-2 rounded">
-                                <img src={HideIcon} alt="Hide" className="w-5 h-5" />
+                                <img
+                                    src={HideIcon}
+                                    alt="Hide"
+                                    className="w-5 h-5"
+                                />
                                 <span>Hide</span>
                             </div>
                             <div className="flex items-center space-x-2 hover:bg-gray-100 p-2 rounded">
-                                <img src={ReportIcon} alt="Report" className="w-5 h-5" />
+                                <img
+                                    src={ReportIcon}
+                                    alt="Report"
+                                    className="w-5 h-5"
+                                />
                                 <span>Report</span>
                             </div>
                         </div>
@@ -158,7 +178,7 @@ export default function PostCard({
             {/* Image */}
             {imageUrl && (
                 <img
-                    src={imageUrl}
+                    src={`http://localhost:5000${imageUrl}`}
                     alt="Post visual"
                     className="w-full max-h-[512px] object-cover rounded-2xl"
                     onClick={handleImageClick}
@@ -171,9 +191,14 @@ export default function PostCard({
                     <button
                         onClick={closeModal}
                         className="absolute top-4 right-4 text-white text-2xl z-50 rounded-full p-2"
-                        style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }} // Inline style for background opacity
+                        style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }} // Inline style for background opacity
                     >
-                        <img src={CloseIcon} alt="Close" className="w-6 h-6" style={{ filter: 'invert(1)' }} />
+                        <img
+                            src={CloseIcon}
+                            alt="Close"
+                            className="w-6 h-6"
+                            style={{ filter: "invert(1)" }}
+                        />
                     </button>
                     <div className="relative">
                         <img
@@ -189,7 +214,9 @@ export default function PostCard({
             <div className="flex items-center text-sm text-black text-semibold space-x-5 py-2">
                 <div
                     className={`flex items-center space-x-1 p-1 rounded-full ${
-                        isUpvoted || isDownvoted ? 'bg-red-500 text-white' : 'bg-gray-200 text-black'
+                        isUpvoted || isDownvoted
+                            ? "bg-red-500 text-white"
+                            : "bg-gray-200 text-black"
                     }`}
                 >
                     <div onClick={toggleUpvote} className="cursor-pointer">
@@ -197,7 +224,7 @@ export default function PostCard({
                             src={UpvoteIcon}
                             alt="Upvote"
                             className="w-5 h-5"
-                            style={{ color: isUpvoted ? 'white' : 'black' }}
+                            style={{ color: isUpvoted ? "white" : "black" }}
                         />
                     </div>
                     <span>{score}</span>
@@ -206,11 +233,14 @@ export default function PostCard({
                             src={DownvoteIcon}
                             alt="Downvote"
                             className="w-5 h-5"
-                            style={{ color: isDownvoted ? 'white' : 'black' }}
+                            style={{ color: isDownvoted ? "white" : "black" }}
                         />
                     </div>
                 </div>
-                <Link to={`/post/${id}`} className="flex items-center space-x-1 bg-gray-200 p-1 rounded-full hover:bg-gray-300">
+                <Link
+                    to={`/post/${id}`}
+                    className="flex items-center space-x-1 bg-gray-200 p-1 rounded-full hover:bg-gray-300"
+                >
                     <img src={CommentIcon} alt="Comment" className="w-5 h-5" />
                     <span>{comments}</span>
                 </Link>
@@ -218,10 +248,13 @@ export default function PostCard({
                     <img src={AwardIcon} alt="Award" className="w-5 h-5" />
                     <span>6</span>
                 </div>
-                <div className="flex items-center space-x-1 bg-gray-200 p-1 rounded-full cursor-pointer" onClick={() => {
-                    // Handle share functionality
-                    console.log('Share clicked');
-                }}>
+                <div
+                    className="flex items-center space-x-1 bg-gray-200 p-1 rounded-full cursor-pointer"
+                    onClick={() => {
+                        // Handle share functionality
+                        console.log("Share clicked");
+                    }}
+                >
                     <img src={ShareIcon} alt="Share" className="w-5 h-5" />
                     <span>Share</span>
                 </div>

@@ -11,9 +11,16 @@ export default function PostForm() {
     const [linkUrl, setLinkUrl] = useState("");
     const [image, setImage] = useState<File | null>(null);
 
-    const [selectedSubreddit, setSelectedSubreddit] = useState<string | null>(
-        null
-    );
+    type Subreddit = {
+        _id: string;
+        name: string;
+        icon: string;
+        memberCount: number;
+    };
+
+    const [selectedSubreddit, setSelectedSubreddit] =
+        useState<Subreddit | null>(null);
+
     const [showDropdown, setShowDropdown] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
 
@@ -33,7 +40,7 @@ export default function PostForm() {
         const formData = new FormData();
         formData.append("title", title);
         formData.append("postType", postType);
-        formData.append("community", selectedSubreddit);
+        formData.append("community", selectedSubreddit._id);
 
         if (postType === "text") {
             formData.append("content", body);
@@ -51,11 +58,7 @@ export default function PostForm() {
         try {
             const res = await fetch("http://localhost:5000/api/posts", {
                 method: "POST",
-                headers: {
-                    Authorization: `Bearer ${
-                        localStorage.getItem("token") || ""
-                    }`,
-                },
+                credentials: "include", // ✅ send the auth cookie
                 body: formData,
             });
 
@@ -94,12 +97,16 @@ export default function PostForm() {
                     >
                         <span className="flex items-center space-x-2">
                             <img
-                                src="https://www.redditstatic.com/avatars/defaults/v2/avatar_default_1.png"
+                                src={
+                                    selectedSubreddit
+                                        ? selectedSubreddit.icon
+                                        : "https://www.redditstatic.com/avatars/defaults/v2/avatar_default_1.png"
+                                }
                                 className="w-5 h-5 rounded-full"
                             />
                             <span>
                                 {selectedSubreddit
-                                    ? `r/${selectedSubreddit}`
+                                    ? `r/${selectedSubreddit.name}`
                                     : "Select a community"}
                             </span>
                         </span>
@@ -135,21 +142,30 @@ export default function PostForm() {
                                     </div>
 
                                     {/* Subreddit list */}
-                                    {subreddits
-                                        .filter((s) =>
-                                            s.name
-                                                .toLowerCase()
-                                                .includes(
-                                                    searchTerm.toLowerCase()
-                                                )
-                                        )
-                                        .map((s) => (
+                                    {/* Subreddit list */}
+                                    {(() => {
+                                        const filtered = subreddits.filter(
+                                            (s) =>
+                                                s.name
+                                                    .toLowerCase()
+                                                    .includes(
+                                                        searchTerm.toLowerCase()
+                                                    )
+                                        );
+
+                                        if (filtered.length === 0) {
+                                            return (
+                                                <div className="p-4 text-sm text-gray-500">
+                                                    No communities found.
+                                                </div>
+                                            );
+                                        }
+
+                                        return filtered.map((s) => (
                                             <button
-                                                key={s.name}
+                                                key={s._id}
                                                 onClick={() => {
-                                                    setSelectedSubreddit(
-                                                        s.name
-                                                    );
+                                                    setSelectedSubreddit(s);
                                                     setShowDropdown(false);
                                                 }}
                                                 className="w-full text-left px-3 py-2 hover:bg-gray-100 flex items-center space-x-3 text-sm"
@@ -169,7 +185,8 @@ export default function PostForm() {
                                                     </div>
                                                 </div>
                                             </button>
-                                        ))}
+                                        ));
+                                    })()}
                                 </>
                             )}
                         </div>
