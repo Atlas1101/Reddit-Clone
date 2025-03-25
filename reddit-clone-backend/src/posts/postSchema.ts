@@ -6,8 +6,17 @@ interface IPost extends mongoose.Document {
     title: string;
     content: string;
     author: mongoose.Schema.Types.ObjectId;
-    community: string;
-    postType: PostType; // ✅ NEW
+    community:
+        | mongoose.Types.ObjectId
+        | {
+              _id: mongoose.Types.ObjectId; // ✅ Add this line
+              name: string;
+              icon?: string;
+              description?: string;
+              bannerImage?: string;
+          };
+
+    postType: PostType;
     commentCount: number;
     createdAt: Date;
 }
@@ -21,10 +30,14 @@ const PostSchema = new mongoose.Schema<IPost>(
             ref: "User",
             required: true,
         },
-        community: { type: String, required: true },
+        community: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Community",
+            required: true,
+        },
         postType: {
             type: String,
-            enum: ["text", "image", "link", "poll"], // ✅ NEW
+            enum: ["text", "image", "link", "poll"],
             required: true,
         },
         commentCount: { type: Number, default: 0 },

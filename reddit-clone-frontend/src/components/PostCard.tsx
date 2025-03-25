@@ -11,6 +11,7 @@ import HideIcon from "../assets/hide-icon.svg";
 import ReportIcon from "../assets/report-icon.svg";
 import SaveIcon from "../assets/save-icon.svg";
 import { useAuthModal } from "../context/AuthModalContext";
+import CommunityHoverCard from "./HoverCard/CommunityHoverCard"; // adjust path if needed
 
 type PostProps = {
     id: string;
@@ -22,6 +23,9 @@ type PostProps = {
     body?: string;
     imageUrl?: string;
     subreddit?: string;
+    subredditIcon?: string;
+    subredditDescription?: string;
+    subredditBanner?: string;
 };
 
 export default function PostCard({
@@ -33,12 +37,17 @@ export default function PostCard({
     createdAt,
     body,
     imageUrl,
-    subreddit = "exampleSub",
+    subreddit,
+    subredditIcon,
+    subredditDescription,
+    subredditBanner,
+    communityId,
 }: PostProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isOptionsOpen, setIsOptionsOpen] = useState(false);
     const [isUpvoted, setIsUpvoted] = useState(false); // State for upvote
     const [isDownvoted, setIsDownvoted] = useState(false); // State for downvote
+    const [isHoveringCommunity, setIsHoveringCommunity] = useState(false);
 
     console.log("PostCard imageUrl:", imageUrl);
 
@@ -92,16 +101,31 @@ export default function PostCard({
             <div className="flex items-center justify-between text-xs text-gray-500">
                 <div className="flex items-center space-x-2">
                     <img
-                        src={`https://www.redditstatic.com/avatars/defaults/v2/avatar_default_2.png`}
+                        src={
+                            subredditIcon ??
+                            "https://www.redditstatic.com/avatars/defaults/v2/avatar_default_2.png"
+                        }
                         alt="subreddit avatar"
                         className="w-6 h-6 rounded-full"
                     />
-                    <Link
-                        to={`/r/${subreddit}`}
-                        className="font-semibold text-black hover:underline"
+
+                    <div
+                        className="relative inline-block"
+                        onMouseEnter={() => setIsHoveringCommunity(true)}
+                        onMouseLeave={() => setIsHoveringCommunity(false)}
                     >
-                        r/{subreddit}
-                    </Link>
+                        <Link
+                            to={`/r/${subreddit}`}
+                            className="font-semibold text-black hover:underline"
+                        >
+                            r/{subreddit}
+                        </Link>
+
+                        {isHoveringCommunity && (
+                            <CommunityHoverCard communityId={communityId} />
+                        )}
+                    </div>
+
                     <span>•</span>
                     <span>{createdAt}</span>
                 </div>
