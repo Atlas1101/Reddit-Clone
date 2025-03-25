@@ -43,7 +43,8 @@ export const getUserCommunities = async (req: AuthRequest, res: Response) => {
         const resolvedUserId = userId === "me" ? req.user?.id : userId;
 
         if (!resolvedUserId) {
-            return res.status(401).json({ message: "Unauthorized" });
+            res.status(401).json({ message: "Unauthorized" });
+            return;
         }
 
         const communities = await getUserCommunitiesService(resolvedUserId);

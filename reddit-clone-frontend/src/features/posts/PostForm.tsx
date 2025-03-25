@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
-import { useRef } from "react";
+import { useState, useRef } from "react";
 import useClickOutside from "../../hooks/useClickOutside";
+import useUserCommunities from "../../hooks/useUserCommunities"; // ✅
 
 type PostType = "text" | "image" | "link" | "poll";
 
@@ -20,37 +20,7 @@ export default function PostForm() {
     const dropdownRef = useRef<HTMLDivElement>(null);
     useClickOutside(dropdownRef, () => setShowDropdown(false));
 
-    const [subreddits, setSubreddits] = useState<
-        { _id: string; name: string; icon: string; memberCount: number }[]
-    >([]);
-
-    useEffect(() => {
-        const fetchCommunities = async () => {
-            try {
-                const token = localStorage.getItem("token");
-                const res = await fetch(
-                    "http://localhost:5000/api/users/me/communities",
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                    }
-                );
-
-                if (!res.ok) {
-                    throw new Error("Failed to load communities");
-                }
-
-                const data = await res.json();
-
-                setSubreddits(data);
-            } catch (err) {
-                console.error("Error loading communities:", err);
-            }
-        };
-
-        fetchCommunities();
-    }, []);
+    const { subreddits, loading, error } = useUserCommunities(); // ✅ replaced old logic
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -70,12 +40,12 @@ export default function PostForm() {
         }
 
         if (postType === "image" && image) {
-            formData.append("image", image); // this goes to req.file
+            formData.append("image", image);
         }
 
         if (postType === "link") {
             formData.append("linkUrl", linkUrl);
-            formData.append("content", linkUrl); // backend expects "content"
+            formData.append("content", linkUrl);
         }
 
         try {
@@ -97,7 +67,6 @@ export default function PostForm() {
 
             const data = await res.json();
             console.log("✅ Post created:", data);
-            // redirect, clear form, or show success UI
         } catch (err) {
             console.error("Error submitting post:", err);
             alert("Something went wrong.");
@@ -139,54 +108,70 @@ export default function PostForm() {
 
                     {showDropdown && (
                         <div className="absolute z-50 mt-2 w-full bg-white border rounded-2xl shadow-md max-h-96 overflow-y-auto">
-                            {/* Search bar */}
-                            <div className="relative">
-                                <span className="absolute left-3 top-2.5 text-gray-500 text-sm">
-                                    🔍
-                                </span>
-                                <input
-                                    type="text"
-                                    placeholder="Search communities"
-                                    value={searchTerm}
-                                    onChange={(e) =>
-                                        setSearchTerm(e.target.value)
-                                    }
-                                    className="w-full pl-8 pr-3 py-2 text-sm border-b focus:outline-none rounded-t-2xl"
-                                />
-                            </div>
-
-                            {/* Subreddit list */}
-                            {subreddits
-                                .filter((s) =>
-                                    s.name
-                                        .toLowerCase()
-                                        .includes(searchTerm.toLowerCase())
-                                )
-                                .map((s) => (
-                                    <button
-                                        key={s.name}
-                                        onClick={() => {
-                                            setSelectedSubreddit(s.name);
-                                            setShowDropdown(false);
-                                        }}
-                                        className="w-full text-left px-3 py-2 hover:bg-gray-100 flex items-center space-x-3 text-sm"
-                                    >
-                                        <img
-                                            src={s.icon}
-                                            alt=""
-                                            className="w-5 h-5 rounded-full"
+                            {loading ? (
+                                <div className="p-4 text-sm text-gray-500">
+                                    Loading...
+                                </div>
+                            ) : error ? (
+                                <div className="p-4 text-sm text-red-500">
+                                    {error}
+                                </div>
+                            ) : (
+                                <>
+                                    {/* Search bar */}
+                                    <div className="relative">
+                                        <span className="absolute left-3 top-2.5 text-gray-500 text-sm">
+                                            🔍
+                                        </span>
+                                        <input
+                                            type="text"
+                                            placeholder="Search communities"
+                                            value={searchTerm}
+                                            onChange={(e) =>
+                                                setSearchTerm(e.target.value)
+                                            }
+                                            className="w-full pl-8 pr-3 py-2 text-sm border-b focus:outline-none rounded-t-2xl"
                                         />
-                                        <div>
-                                            <div className="font-medium">
-                                                r/{s.name}
-                                            </div>
-                                            <div className="text-xs text-gray-500">
-                                                {s.members.toLocaleString()}{" "}
-                                                members
-                                            </div>
-                                        </div>
-                                    </button>
-                                ))}
+                                    </div>
+
+                                    {/* Subreddit list */}
+                                    {subreddits
+                                        .filter((s) =>
+                                            s.name
+                                                .toLowerCase()
+                                                .includes(
+                                                    searchTerm.toLowerCase()
+                                                )
+                                        )
+                                        .map((s) => (
+                                            <button
+                                                key={s.name}
+                                                onClick={() => {
+                                                    setSelectedSubreddit(
+                                                        s.name
+                                                    );
+                                                    setShowDropdown(false);
+                                                }}
+                                                className="w-full text-left px-3 py-2 hover:bg-gray-100 flex items-center space-x-3 text-sm"
+                                            >
+                                                <img
+                                                    src={s.icon}
+                                                    alt=""
+                                                    className="w-5 h-5 rounded-full"
+                                                />
+                                                <div>
+                                                    <div className="font-medium">
+                                                        r/{s.name}
+                                                    </div>
+                                                    <div className="text-xs text-gray-500">
+                                                        {s.memberCount.toLocaleString()}{" "}
+                                                        members
+                                                    </div>
+                                                </div>
+                                            </button>
+                                        ))}
+                                </>
+                            )}
                         </div>
                     )}
                 </div>
