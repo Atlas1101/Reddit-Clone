@@ -1,5 +1,7 @@
 import PostCard from "../components/PostCard";
 import randomImage from "../assets/random.jpg";
+import { useEffect } from "react";
+import { api } from "../services/api";
 
 const dummyPosts = [
     {
@@ -33,6 +35,12 @@ const dummyPosts = [
 ];
 
 export default function Home() {
+    useEffect(() => {
+        api.get("/posts").then((res) => {
+            console.log(res.data);
+        });
+    }, []);
+
     return (
         <div className="space-y-4">
             {dummyPosts.map((post) => (

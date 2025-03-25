@@ -33,7 +33,7 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
             secure: process.env.NODE_ENV === "production",
             sameSite: "lax", // ← add this ill change to none when adding front end and running it on 3000 !!!!!!!!!!!!!!!
         });
-
+        
         res.json({ message: "Login successful" });
     } catch (error) {
         res.status(400).json({
@@ -47,6 +47,7 @@ export const logoutUser = (req: Request, res: Response): void => {
     res.clearCookie("token");
     res.json({ message: "Logged out successfully" });
 };
+
 
 // import { Request, Response } from "express";
 // import jwt from "jsonwebtoken";

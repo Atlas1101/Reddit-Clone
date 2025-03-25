@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import  CloseIcon  from '../assets/close-icon.svg';
+import axios from 'axios';
+import { auth } from '../services/api';
 
 interface LoginProps {
     onClose?: () => void;
@@ -9,6 +11,13 @@ export default function Login({ onClose }: LoginProps) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        console.log(email, password);
+        auth.login(email,password)
+        
+        
+    };
     return (
         <div className="fixed inset-0 bg-white bg-opacity-50 flex items-center justify-center p-4 ">
             <div className="bg-white rounded-lg max-w-md w-full h-full p-2 relative pt-10 flex flex-col">
@@ -39,7 +48,8 @@ export default function Login({ onClose }: LoginProps) {
 
                 <div className="text-center text-gray-500 my-2">OR</div>
 
-                <form className="space-y-4 flex-1 flex flex-col">
+                <form className="space-y-4 flex-1 flex flex-col"
+                onSubmit={handleSubmit}>
                     <div>
                         <input
                             type="text"

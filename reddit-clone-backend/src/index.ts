@@ -11,7 +11,7 @@ import commentRoutes from "./comments/commentRoutes";
 import voteRoutes from "./votes/voteRoutes";
 import userRoutes from "./users/userRoutes";
 import communityRoutes from "./community/communityRoutes";
-
+import { protect } from "./middleware/authMiddleware";
 import "./users/userSchema";
 import "./posts/postSchema";
 import "./community/communitySchema";
@@ -24,7 +24,7 @@ const app = express();
 app.use(express.json());
 app.use(
     cors({
-        origin: "http://localhost:5000", // or your frontend origin
+        origin: "http://localhost:5173", // or your frontend origin
         credentials: true,
     })
 );
@@ -34,7 +34,7 @@ app.use(cookieParser());
 // Route registration
 app.use("/api/auth", userRoutes);
 app.use("/api/auth", authRoutes);
-app.use("/api/posts", postRoutes);
+app.use("/api/posts",postRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/votes", voteRoutes);
 app.use("/api/users", userRoutes);
