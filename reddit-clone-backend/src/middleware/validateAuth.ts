@@ -19,7 +19,7 @@ export const userLoginSchema = z.object({
 // ✅ Post Input Schema — what the client can send
 export const createPostInputSchema = z.object({
     title: z.string().min(1, "Title is required"),
-    content: z.string().min(10, "Content must be at least 10 characters"),
+    content: z.string().min(1, "Content must be at least 1 characters"),
     community: z.string().min(1, "Community is required"),
     postType: z.enum(["text", "image", "link", "poll"]),
 });
