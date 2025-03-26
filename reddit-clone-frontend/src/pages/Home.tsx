@@ -35,7 +35,8 @@ import { api } from "../services/api";
 // ];
 
 type Post = {
-    id: string;
+    _id: string; // add this line
+    id?: string;
     title: string;
     author: string;
     score: number;
@@ -56,11 +57,16 @@ export default function Home() {
             })
             .catch((err) => console.error("Failed to load posts", err));
     }, []);
+    console.log("Rendering post:", posts);
 
     return (
         <div className="space-y-4 max-w-4xl mx-auto">
             {posts.map((post) => (
-                <PostCard key={post.id} {...post} />
+                <PostCard
+                    key={post._id}
+                    {...post}
+                    id={post._id} // ✅ override missing `id` prop
+                />
             ))}
         </div>
     );
