@@ -58,7 +58,7 @@ export default function Home() {
     }, []);
 
     return (
-        <div className="space-y-4">
+        <div className="space-y-4 max-w-4xl mx-auto">
             {posts.map((post) => (
                 <PostCard key={post.id} {...post} />
             ))}
