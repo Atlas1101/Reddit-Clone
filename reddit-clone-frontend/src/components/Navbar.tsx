@@ -67,7 +67,7 @@ export default function Navbar() {
                         className="flex items-center space-x-1 px-3 py-1 rounded-full hover:bg-gray-200 transition"
                     >
                         <span className="text-xl font-light">＋</span>
-                        <span className="text-sm font-medium">Create</span>
+                        <span className="text-sm font-medium sm:hidden">Create</span>
                     </Link>
                     <button 
                         onClick={() => setShowLogin(true)}
