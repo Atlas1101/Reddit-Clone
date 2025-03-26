@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import  CloseIcon  from '../assets/close-icon.svg';
-import axios from 'axios';
+
 import { auth } from '../services/api';
 
 interface LoginProps {

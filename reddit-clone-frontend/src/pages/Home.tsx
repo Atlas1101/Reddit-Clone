@@ -1,5 +1,5 @@
 import PostCard from "../components/PostCard";
-import randomImage from "../assets/random.jpg";
+
 import { useEffect, useState } from "react";
 import { api } from "../services/api";
 
