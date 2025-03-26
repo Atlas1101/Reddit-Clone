@@ -10,14 +10,17 @@ import {
 } from "../middleware/validateAuth";
 import { z } from "zod";
 
-// Get all posts
 export const getAllPostsService = async () => {
-    return await Post.find().populate("author", "username");
+    return await Post.find()
+        .populate("author", "username")
+        .populate("community", "name icon description bannerImage");
 };
 
 // Get a post by ID
 export const getPostByIdService = async (id: string) => {
-    return await Post.findById(id).populate("author", "username");
+    return await Post.findById(id)
+        .populate("author", "username")
+        .populate("community", "name icon description bannerImage");
 };
 
 // Create a new post

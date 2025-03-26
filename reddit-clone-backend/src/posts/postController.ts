@@ -22,15 +22,37 @@ export const getAllPosts = async (
     res: Response
 ): Promise<void> => {
     try {
-        const posts = await getAllPostsService();
+        const posts = await getAllPostsService(); // will populate community
+
         if (posts.length === 0) {
             res.status(404).json({ message: "No posts found" });
             return;
         }
-        const formattedPosts = posts.map((post) => ({
-            ...post.toObject(),
-            imageUrl: post.postType === "image" ? post.content : undefined,
-        }));
+
+        const formattedPosts = posts.map((post) => {
+            const postObj = post.toObject();
+            const community = postObj.community;
+
+            const isPopulated =
+                typeof community === "object" &&
+                community !== null &&
+                "name" in community;
+
+            return {
+                ...postObj,
+                subreddit: isPopulated ? community.name : undefined,
+                subredditIcon: isPopulated ? community.icon : undefined,
+                subredditDescription: isPopulated
+                    ? community.description
+                    : undefined,
+                subredditBanner: isPopulated
+                    ? community.bannerImage
+                    : undefined,
+                communityId: isPopulated ? community._id : undefined,
+
+                imageUrl: post.postType === "image" ? post.content : undefined,
+            };
+        });
 
         res.status(200).json(formattedPosts);
     } catch (error) {
@@ -54,8 +76,25 @@ export const getPostById = async (
             res.status(404).json({ message: "Post not found" });
             return;
         }
+
+        const postObj = post.toObject();
+        const community = postObj.community;
+
+        const isPopulated =
+            typeof community === "object" &&
+            community !== null &&
+            "name" in community;
+
         res.status(200).json({
-            ...post.toObject(),
+            ...postObj,
+            subreddit: isPopulated ? community.name : undefined,
+            subredditIcon: isPopulated ? community.icon : undefined,
+            subredditDescription: isPopulated
+                ? community.description
+                : undefined,
+            subredditBanner: isPopulated ? community.bannerImage : undefined,
+            communityId: isPopulated ? community._id : undefined,
+
             imageUrl: post.postType === "image" ? post.content : undefined,
         });
     } catch (error) {

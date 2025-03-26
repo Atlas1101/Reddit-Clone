@@ -10,6 +10,9 @@ export interface ICommunity extends mongoose.Document {
     name: string;
     description?: string;
     icon?: string;
+    bannerImage?: string;
+    memberCount?: number;
+    onlineCount?: number; // ✅ Optional (can be mock or live)
     createdBy: mongoose.Types.ObjectId;
     moderators: mongoose.Types.ObjectId[];
     members: mongoose.Types.ObjectId[];
@@ -29,6 +32,9 @@ const CommunitySchema = new mongoose.Schema<ICommunity>(
         name: { type: String, required: true, unique: true },
         description: { type: String },
         icon: { type: String },
+        bannerImage: { type: String },
+        memberCount: { type: Number, default: 1 },
+        onlineCount: { type: Number, default: 0 },
         createdBy: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
