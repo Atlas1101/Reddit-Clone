@@ -27,7 +27,12 @@ export const getAllPosts = async (
             res.status(404).json({ message: "No posts found" });
             return;
         }
-        res.status(200).json(posts);
+        const formattedPosts = posts.map((post) => ({
+            ...post.toObject(),
+            imageUrl: post.postType === "image" ? post.content : undefined,
+        }));
+
+        res.status(200).json(formattedPosts);
     } catch (error) {
         console.error("Error fetching posts:", error);
         res.status(500).json({
@@ -49,7 +54,10 @@ export const getPostById = async (
             res.status(404).json({ message: "Post not found" });
             return;
         }
-        res.status(200).json(post);
+        res.status(200).json({
+            ...post.toObject(),
+            imageUrl: post.postType === "image" ? post.content : undefined,
+        });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Server error" });
@@ -104,7 +112,14 @@ export const createPost = async (
         // Pass to service
         const newPost = await createPostService(parsed, req.user.id.toString());
 
-        res.status(201).json({ post: newPost, message: "New post created" });
+        res.status(201).json({
+            post: {
+                ...newPost.toObject(), // flatten the Mongoose document
+                imageUrl:
+                    newPost.postType === "image" ? newPost.content : undefined,
+            },
+            message: "New post created",
+        });
     } catch (error) {
         if (error instanceof z.ZodError) {
             res.status(400).json({

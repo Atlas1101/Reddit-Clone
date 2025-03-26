@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import connectDB from "./config/db";
+import path from "path";
 
 // Routes
 import authRoutes from "./authentication/authRoutes";
@@ -15,6 +16,8 @@ import { protect } from "./middleware/authMiddleware";
 import "./users/userSchema";
 import "./posts/postSchema";
 import "./community/communitySchema";
+
+console.log("__dirname:", __dirname);
 
 dotenv.config();
 connectDB();
@@ -31,10 +34,17 @@ app.use(
 
 app.use(cookieParser());
 
+//multer images
+app.use("/uploads", express.static(path.resolve(__dirname, "../../uploads")));
+
+app.get("/test-image", (req, res) => {
+    res.sendFile(path.join(__dirname, "../../uploads/1742919694797-image.jpg"));
+});
+
 // Route registration
 app.use("/api/auth", userRoutes);
 app.use("/api/auth", authRoutes);
-app.use("/api/posts",postRoutes);
+app.use("/api/posts", postRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/votes", voteRoutes);
 app.use("/api/users", userRoutes);
