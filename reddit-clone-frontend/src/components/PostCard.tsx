@@ -94,6 +94,7 @@ export default function PostCard({
             console.log("Joining community");
         });
     };
+    console.log("PostCard link id:", id);
 
     return (
         <div className="bg-white shadow text-black space-y-1">
@@ -141,7 +142,6 @@ export default function PostCard({
                     </button>
                 </div>
             </div>
-
             {/* Options Modal */}
             {isOptionsOpen && (
                 <div className="fixed inset-0 z-50">
@@ -193,12 +193,13 @@ export default function PostCard({
                 </div>
             )}
 
-            {/* Title */}
-            <h2 className="text-lg font-semibold text-gray-800">{title}</h2>
-
-            {/* Body text */}
-            {body && <p className="text-sm text-gray-800 ">{body}</p>}
-
+            <Link
+                to={`/post/${id}`}
+                className="block space-y-2 hover:bg-gray-50 rounded-lg p-2"
+            >
+                <h2 className="text-lg font-semibold text-gray-800">{title}</h2>
+                {body && <p className="text-sm text-gray-800">{body}</p>}
+            </Link>
             {/* Image */}
             {imageUrl && (
                 <img
@@ -208,7 +209,6 @@ export default function PostCard({
                     onClick={handleImageClick}
                 />
             )}
-
             {/* Modal */}
             {isModalOpen && (
                 <div className="fixed bg-black inset-0 bg-opacity-75 flex justify-center items-center z-50">
@@ -233,7 +233,6 @@ export default function PostCard({
                     </div>
                 </div>
             )}
-
             {/* Action bar */}
             <div className="flex items-center text-sm text-black text-semibold space-x-5 py-2">
                 <div
