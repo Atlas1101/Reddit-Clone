@@ -26,6 +26,7 @@ type PostProps = {
     subredditIcon?: string;
     subredditDescription?: string;
     subredditBanner?: string;
+    communityId?: string;
 };
 
 export default function PostCard({
@@ -123,7 +124,7 @@ export default function PostCard({
                         </Link>
 
                         {isHoveringCommunity && (
-                            <CommunityHoverCard communityId={communityId} />
+                            <CommunityHoverCard communityId={communityId ?? ''} />
                         )}
                     </div>
 

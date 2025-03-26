@@ -10,6 +10,7 @@ interface User {
 interface UserContextType {
     user: User | null;
     isLoading: boolean;
+    fetchUser: () => Promise<void>;
     logout: () => void;
     login: (email: string, password: string) => Promise<void>;
 }
@@ -36,12 +37,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
     }, []);
 
     const login = async (email: string, password: string) => {
-        const response = await auth.login(email, password);
-        if (response.message === "Login successful") {
-            await fetchUser(); // Fetch user data after successful login
-        } else {
-            throw new Error("Login failed");
-        }
+        await auth.login(email, password);
+        await fetchUser(); // Fetch user data after successful login
     };
 
     const logout = () => {
@@ -50,7 +47,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
     };
 
     return (
-        <UserContext.Provider value={{ user, isLoading, logout, login }}>
+        <UserContext.Provider value={{ user, isLoading, fetchUser, logout, login }}>
             {children}
         </UserContext.Provider>
     );
