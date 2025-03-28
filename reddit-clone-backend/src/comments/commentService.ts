@@ -34,7 +34,7 @@ const getAllChildComments = async (
 export const createCommentService = async (input: unknown, userId: string) => {
     const { postId, content, parentCommentId }: CommentInput =
         commentSchema.parse(input);
-
+    console.log("🧪 Validated input:", { postId, content, parentCommentId }); // ✅ log immediately
     const session = await mongoose.startSession();
     session.startTransaction();
 
@@ -136,7 +136,6 @@ export const updateCommentService = async (
 
     return updated;
 };
-
 
 export const deleteCommentService = async (
     commentIdRaw: string,

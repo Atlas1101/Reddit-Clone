@@ -1,16 +1,14 @@
-import { useEffect, useState } from "react";
-import { Comment } from "../components/Comment/CommentThread";
+import { useEffect, useState, useCallback } from "react";
+import { Comment } from "../types/Comment";
 
 export default function useComments(postId: string | undefined) {
     const [comments, setComments] = useState<Comment[]>([]);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        if (!postId) {
-            console.warn("useComments: called with undefined postId");
-            setLoading(false);
-            return;
-        }
+    const fetchComments = useCallback(() => {
+        if (!postId) return;
+
+        setLoading(true);
 
         fetch(`http://localhost:5000/api/comments/post/${postId}`)
             .then((res) => res.json())
@@ -19,7 +17,11 @@ export default function useComments(postId: string | undefined) {
                 setLoading(false);
             })
             .catch(() => setLoading(false));
-    }, [postId]);
+    }, [postId]); // ✅ React knows to re-create if postId changes
 
-    return { comments, loading };
+    useEffect(() => {
+        fetchComments();
+    }, [fetchComments]); // ✅ now fetchComments is safe and tracked
+
+    return { comments, loading, refetchComments: fetchComments };
 }
