@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useAuthModal } from '../context/AuthModalContext';
 import { useUser } from "../context/UserContext";
 import Avatar from "./Avatar";
+import Sidebar from "./sidebar.tsx";
 import SearchIcon from "../assets/search-icon.svg";
 import backIcon from "../assets/back-icon.svg";
 
@@ -84,7 +85,6 @@ export default function Navbar() {
                         <span className="text-sm font-medium hidden sm:block">Create</span>
                     </Link>
 
-                    {/* Conditional Rendering: Log In button or Avatar */}
                     {!isLoading && (user ? (
                         <Avatar />
                     ) : (
@@ -105,15 +105,31 @@ export default function Navbar() {
                 </div>
             </nav>
 
+            {/* Sidebar Overlay */}
+            {showSidebar && (
+                <div 
+                className={`fixed inset-0 z-50 transition-opacity ${animateOut ? 'opacity-0' : 'opacity-100'}`}
+                style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
+                 onClick={handleCloseSidebar}
+                  />
+            )}
+
+            {/* Sidebar Component */}
+            {showSidebar && (
+                <div className={`fixed left-0 top-0 bottom-0 z-50 transition-transform ${animateOut ? '-translate-x-full' : 'translate-x-0'}`}>
+                    <Sidebar />
+                </div>
+            )}
+
             {/* Mobile Full-Screen Search Modal */}
             {searchOpen && (
-                <div className="fixed inset-0 bg-white z-50 p-4 flex items-center justify-center">
+                <div className="fixed inset-0 bg-white z-50 p-4 flex items-start justify-center">
                     <div className="relative w-full max-w-lg mx-auto">
                         <button
                             onClick={() => setSearchOpen(false)}
                             className="absolute left-2 top-2 text-2xl"
                         >
-                            <img src={backIcon} alt="Back" className="w-5 h-5" />
+                            <img src={backIcon} alt="Back" className="w-5 h-5 fixed left-2" />
                         </button>
                         <div className="flex items-center space-x-2 bg-gray-100 rounded-full px-4 py-2 shadow-md w-full">
                             <img src={SearchIcon} alt="Search" className="w-5 h-5" />
