@@ -1,4 +1,5 @@
 import { Comment } from "../../types/Comment";
+import CommentCard from "./CommentCard";
 
 export default function CommentThread({
     comment,
@@ -8,11 +9,8 @@ export default function CommentThread({
     depth?: number;
 }) {
     return (
-        <div className={`ml-${depth * 4}`}>
-            {/* Your comment display logic here */}
-            <div>
-                {comment.author}: {comment.content}
-            </div>
+        <div className={`ml-${depth * 4} space-y-2`}>
+            <CommentCard comment={comment} />
             {comment.replies?.map((reply) => (
                 <CommentThread
                     key={reply.id}
