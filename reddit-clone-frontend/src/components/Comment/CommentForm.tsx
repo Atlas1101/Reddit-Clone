@@ -1,22 +1,18 @@
-// components/Comment/CommentForm.tsx
 import { useForm } from "react-hook-form";
 import { useState } from "react";
+import { useParams } from "react-router-dom";
 
 type Props = {
-    postId: string;
-    parentId?: string | null;
-    onSuccess?: () => void;
+    parentId?: string | null; // Optional for top-level comments
+    onSuccess?: () => void; // Optional callback after submission
 };
 
 type FormData = {
     content: string;
 };
 
-export default function CommentForm({
-    postId,
-    parentId = null,
-    onSuccess,
-}: Props) {
+export default function CommentForm({ parentId = null, onSuccess }: Props) {
+    const { id } = useParams(); // Get postId from URL
     const {
         register,
         handleSubmit,
@@ -24,21 +20,32 @@ export default function CommentForm({
         formState: { isSubmitting },
     } = useForm<FormData>();
 
-    console.log("💬 CommentForm props:", { postId, parentId });
+    console.log("💬 CommentForm params:", { postId: id, parentId });
 
     const [error, setError] = useState<string | null>(null);
 
     const onSubmit = async (data: FormData) => {
         setError(null);
+        if (!id) {
+            setError("No post ID found in URL");
+            return;
+        }
+
         try {
+            console.log("🧾 Submitting comment:", {
+                content: data.content,
+                postId: id,
+                parentCommentId: parentId,
+            });
+
             const res = await fetch("http://localhost:5000/api/comments", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                credentials: "include", // ✅ <---- this line is critical
+                credentials: "include", // For auth
                 body: JSON.stringify({
                     ...data,
-                    postId,
-                    ...(parentId ? { parentCommentId: parentId } : {}), // only include if it's a string
+                    postId: id, // Use id from useParams
+                    ...(parentId ? { parentComment: parentId } : {}),
                 }),
             });
 
@@ -46,8 +53,8 @@ export default function CommentForm({
                 throw new Error("Failed to submit comment");
             }
 
-            reset(); // clear form
-            onSuccess?.(); // collapse reply box
+            reset(); // Clear form
+            onSuccess?.(); // Trigger callback (e.g., close form or refetch)
         } catch (err: any) {
             setError(err.message || "Unknown error");
         }

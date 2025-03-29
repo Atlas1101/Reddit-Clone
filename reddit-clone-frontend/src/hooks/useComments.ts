@@ -12,7 +12,7 @@ export default function useComments(postId: string | undefined) {
 
         fetch(`http://localhost:5000/api/comments/post/${postId}`)
             .then((res) => res.json())
-            .then((data) => {
+            .then((data: Comment[]) => {
                 setComments(data);
                 setLoading(false);
             })

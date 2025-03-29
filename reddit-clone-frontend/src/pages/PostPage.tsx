@@ -115,7 +115,7 @@ export default function PostPage() {
 
             {/* Top-Level Comment Form */}
             <div className="bg-white rounded-lg shadow p-4 mb-4">
-                <CommentForm postId={id} onSuccess={refetchComments} />
+                <CommentForm onSuccess={refetchComments} />{" "}
             </div>
 
             {/* Comments Section */}
