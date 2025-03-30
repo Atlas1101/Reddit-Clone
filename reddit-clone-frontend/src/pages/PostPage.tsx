@@ -23,8 +23,10 @@ export default function PostPage() {
     const {
         comments,
         loading: commentsLoading,
-        refetchComments,
-    } = useComments(id);
+        loadMore,
+        hasNextPage,
+        setNewComment,
+    } = useComments(id, 10);
 
     const [isUpvoted, setIsUpvoted] = useState(false);
     const [isDownvoted, setIsDownvoted] = useState(false);
@@ -41,6 +43,10 @@ export default function PostPage() {
     const toggleDownvote = () => {
         setIsDownvoted(!isDownvoted);
         if (isUpvoted) setIsUpvoted(false);
+    };
+
+    const handleCommentSuccess = (newComment: Comment) => {
+        setNewComment((prev) => newComment); // ✅ THIS IS THE CORRECT PLACE
     };
 
     return (
@@ -115,7 +121,8 @@ export default function PostPage() {
 
             {/* Top-Level Comment Form */}
             <div className="bg-white rounded-lg shadow p-4 mb-4">
-                <CommentForm onSuccess={refetchComments} />{" "}
+                <CommentForm onSuccess={handleCommentSuccess} />{" "}
+                {/* The call remains the same */}
             </div>
 
             {/* Comments Section */}
@@ -132,6 +139,17 @@ export default function PostPage() {
                     comments.map((comment) => (
                         <CommentThread key={comment.id} comment={comment} />
                     ))
+                )}
+
+                {hasNextPage && (
+                    <div className="flex justify-center">
+                        <button
+                            onClick={loadMore}
+                            className="px-4 py-2 rounded-full bg-gray-200 text-gray-800 hover:bg-gray-300"
+                        >
+                            Show More Comments
+                        </button>
+                    </div>
                 )}
             </div>
         </div>

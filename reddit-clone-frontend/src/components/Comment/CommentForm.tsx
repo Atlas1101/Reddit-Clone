@@ -1,10 +1,11 @@
 import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
+import { Comment } from "../../types/Comment"; // Import Comment type
 
 type Props = {
-    parentId?: string | null; // Optional for top-level comments
-    onSuccess?: () => void; // Optional callback after submission
+    parentId?: string | null;
+    onSuccess?: (newComment: Comment) => void; // Change onSuccess type
 };
 
 type FormData = {
@@ -12,15 +13,13 @@ type FormData = {
 };
 
 export default function CommentForm({ parentId = null, onSuccess }: Props) {
-    const { id } = useParams(); // Get postId from URL
+    const { id } = useParams();
     const {
         register,
         handleSubmit,
         reset,
         formState: { isSubmitting },
     } = useForm<FormData>();
-
-    console.log("💬 CommentForm params:", { postId: id, parentId });
 
     const [error, setError] = useState<string | null>(null);
 
@@ -32,19 +31,13 @@ export default function CommentForm({ parentId = null, onSuccess }: Props) {
         }
 
         try {
-            console.log("🧾 Submitting comment:", {
-                content: data.content,
-                postId: id,
-                parentCommentId: parentId,
-            });
-
             const res = await fetch("http://localhost:5000/api/comments", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                credentials: "include", // For auth
+                credentials: "include",
                 body: JSON.stringify({
                     ...data,
-                    postId: id, // Use id from useParams
+                    postId: id,
                     ...(parentId ? { parentComment: parentId } : {}),
                 }),
             });
@@ -53,13 +46,14 @@ export default function CommentForm({ parentId = null, onSuccess }: Props) {
                 throw new Error("Failed to submit comment");
             }
 
-            reset(); // Clear form
-            onSuccess?.(); // Trigger callback (e.g., close form or refetch)
+            const newComment: Comment = await res.json(); // ✅ Get the new comment from the response
+
+            reset();
+            onSuccess?.(newComment); // ✅ Pass the new comment to onSuccess
         } catch (err: any) {
             setError(err.message || "Unknown error");
         }
     };
-
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-2">
             <textarea
