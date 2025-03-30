@@ -2,15 +2,18 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { User } from "../types/User";
 import { auth } from "../services/api";
+import PostCard from "../components/PostCard";
 import plusIcon from "../assets/plus-icon.svg";
 import caretDown from "../assets/caret-down.svg";
 
 export default function Profile() {
     const { id } = useParams<{ id: string }>();
     const [user, setUser] = useState<User | null>(null);
+    const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState("Overview");
     const [isAboutOpen, setIsAboutOpen] = useState(false);
+
     const tabs = ["Overview", "Posts", "Comments", "Saved", "Hidden", "Upvoted", "Downvoted"];
 
     useEffect(() => {
@@ -27,9 +30,30 @@ export default function Profile() {
                 setLoading(false);
             }
         };
-
+    
         fetchUser();
     }, [id]);
+
+    useEffect(() => {
+        const fetchPosts = async () => {
+          if (!user?._id) return;
+      
+          try {
+            const response = await fetch(`/api/posts?authorId=${user._id}`, {
+              credentials: "include", // ✅ חובה עם cookies
+            });
+      
+            const data = await response.json(); // אתה כבר לא צריך text אם אתה מקבל JSON
+            console.log("Posts:", data);
+            setPosts(data);
+          } catch (error) {
+            console.error("Error fetching user's posts:", error);
+          }
+        };
+      
+        fetchPosts();
+      }, [user]);
+   
 
     if (loading) {
         return <div>Loading...</div>;
@@ -91,9 +115,46 @@ export default function Profile() {
                 </div>
             </div>
             <div className="mt-4 px-4 pb-4">
-                <div className="bg-gray-100 p-3 rounded-lg shadow-sm">
-                    <p className="text-gray-700">Post content will render here...</p>
-                </div>
+            <div className="mt-4 px-4 pb-4">
+  {activeTab === "Posts" && (
+    <div className="space-y-4">
+      {posts.length > 0 ? (
+        posts.map((post: any) => (
+            <PostCard
+            key={post._id}
+            id={post._id}
+            title={post.title}
+            author={post.author?.username || "Unknown"}
+            score={post.upvotes?.length - post.downvotes?.length || 0} // אם יש לך לוגיקת הצבעות
+            comments={post.commentCount || 0}
+            createdAt={new Date(post.createdAt).toLocaleDateString()}
+            body={post.content}
+            imageUrl={post.imageUrl}
+            subreddit={post.subreddit}
+            subredditIcon={post.subredditIcon}
+            subredditDescription={post.subredditDescription}
+            subredditBanner={post.subredditBanner}
+            communityId={post.communityId}
+          />
+        ))
+      ) : (
+        <p className="text-gray-500">No posts yet.</p>
+      )}
+    </div>
+  )}
+        {activeTab === "Overview" && (
+        <div className="text-gray-700 text-sm p-4">
+            <p>This is the overview tab. Nothing to see here... yet.</p>
+        </div>
+        )}
+
+        {activeTab === "Comments" && (
+        <div className="text-gray-700 text-sm p-4">
+            <p>User comments will go here in the future.</p>
+        </div>
+        )}
+</div>
+
             </div>
         </div>
     );
