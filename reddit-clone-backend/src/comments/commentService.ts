@@ -10,7 +10,7 @@ import {
     objectIdSchema,
 } from "../middleware/validateAuth";
 
-// 🔁 Recursive function to build nested comments
+// Recursive function to build nested comments
 const buildNestedComments = (
     comments: any[],
     parentId: string | null = null
@@ -27,13 +27,14 @@ const buildNestedComments = (
                 comments,
                 comment._id.toString()
             );
+            // Convert the Mongoose document to a plain object and add children
             nested.push({ ...comment.toObject(), children });
         }
     }
     return nested;
 };
 
-// 🔁 Recursive function to get all child comment IDs for deletion
+// Recursive function to get all child comment IDs for deletion
 const getAllChildComments = async (
     parentIds: mongoose.Types.ObjectId[],
     session: mongoose.ClientSession
@@ -50,11 +51,10 @@ const getAllChildComments = async (
             await getAllChildComments(childIds, session)
         );
     }
-
     return allChildComments;
 };
 
-// 📌 Service to create a new comment
+// Service to create a new comment
 export const createCommentService = async (input: unknown, userId: string) => {
     const { postId, content, parentCommentId }: CommentInput =
         commentSchema.parse(input);
@@ -72,15 +72,8 @@ export const createCommentService = async (input: unknown, userId: string) => {
             );
             if (!parent) throw new Error("Parent comment not found");
 
-            // ✅ Ensure parent belongs to same post
-            const parentPostId = new mongoose.Types.ObjectId(
-                parent.post.toString()
-            );
-            const expectedPostId = new mongoose.Types.ObjectId(
-                postId.toString()
-            );
-
-            if (!parentPostId.equals(expectedPostId)) {
+            // Ensure parent belongs to the same post
+            if (parent.post.toString() !== postId.toString()) {
                 throw new Error(
                     "Parent comment does not belong to the given post"
                 );
@@ -99,6 +92,7 @@ export const createCommentService = async (input: unknown, userId: string) => {
             { session }
         );
 
+        // Update reply count or post's comment count
         if (parentCommentId) {
             await Comment.findByIdAndUpdate(
                 parentCommentId,
@@ -130,7 +124,7 @@ export const createCommentService = async (input: unknown, userId: string) => {
     }
 };
 
-// 📌 Service to get comments for a post (with pagination and nesting)
+// Service to get comments for a post (with pagination and nesting)
 export const getCommentsByPostService = async (
     postIdRaw: string,
     page: number = 1,
@@ -139,6 +133,7 @@ export const getCommentsByPostService = async (
     const postId = objectIdSchema.parse(postIdRaw);
     const skip = (page - 1) * pageSize;
 
+    // Fetch the comments for the current page
     const comments = await Comment.find({ post: postId })
         .populate("author", "username")
         .sort({ createdAt: -1 })
@@ -146,17 +141,29 @@ export const getCommentsByPostService = async (
         .limit(pageSize);
 
     const totalComments = await Comment.countDocuments({ post: postId });
+    const totalPages = Math.ceil(totalComments / pageSize);
+
+    // If requested page exceeds total pages, return an empty result
+    if (page > totalPages) {
+        return {
+            comments: [],
+            totalComments,
+            totalPages,
+            currentPage: page,
+        };
+    }
+
     const nestedComments = buildNestedComments(comments);
 
     return {
         comments: nestedComments,
         totalComments,
-        totalPages: Math.ceil(totalComments / pageSize),
+        totalPages,
         currentPage: page,
     };
 };
 
-// 📌 Service to update a comment
+// Service to update a comment
 export const updateCommentService = async (
     commentIdRaw: string,
     contentRaw: unknown,
@@ -181,7 +188,7 @@ export const updateCommentService = async (
     return updated;
 };
 
-// 📌 Service to delete a comment (and its children)
+// Service to delete a comment (and its children)
 export const deleteCommentService = async (
     commentIdRaw: string,
     userId: string
@@ -253,6 +260,7 @@ export const deleteCommentService = async (
         throw error;
     }
 };
+
 // import mongoose from "mongoose";
 // import Comment from "../comments/commentSchema";
 // import Post from "../posts/postSchema";
@@ -265,7 +273,30 @@ export const deleteCommentService = async (
 //     objectIdSchema,
 // } from "../middleware/validateAuth";
 
-// // 🔁 Recursive utility
+// // 🔁 Recursive function to build nested comments
+// const buildNestedComments = (
+//     comments: any[],
+//     parentId: string | null = null
+// ): any[] => {
+//     const nested: any[] = [];
+//     for (const comment of comments) {
+//         // Check if it's a top-level comment or a child of the current parent
+//         if (
+//             (parentId === null && !comment.parentComment) ||
+//             (parentId !== null &&
+//                 comment.parentComment?.toString() === parentId)
+//         ) {
+//             const children = buildNestedComments(
+//                 comments,
+//                 comment._id.toString()
+//             );
+//             nested.push({ ...comment.toObject(), children });
+//         }
+//     }
+//     return nested;
+// };
+
+// // 🔁 Recursive function to get all child comment IDs for deletion
 // const getAllChildComments = async (
 //     parentIds: mongoose.Types.ObjectId[],
 //     session: mongoose.ClientSession
@@ -286,10 +317,11 @@ export const deleteCommentService = async (
 //     return allChildComments;
 // };
 
+// // 📌 Service to create a new comment
 // export const createCommentService = async (input: unknown, userId: string) => {
 //     const { postId, content, parentCommentId }: CommentInput =
 //         commentSchema.parse(input);
-//     console.log("🧪 Validated input:", { postId, content, parentCommentId }); // ✅ log immediately
+//     console.log("🧪 Validated input:", { postId, content, parentCommentId });
 //     const session = await mongoose.startSession();
 //     session.startTransaction();
 
@@ -361,13 +393,33 @@ export const deleteCommentService = async (
 //     }
 // };
 
-// export const getCommentsByPostService = async (postIdRaw: string) => {
+// // 📌 Service to get comments for a post (with pagination and nesting)
+// export const getCommentsByPostService = async (
+//     postIdRaw: string,
+//     page: number = 1,
+//     pageSize: number = 10 // You can adjust this
+// ) => {
 //     const postId = objectIdSchema.parse(postIdRaw);
-//     return await Comment.find({ post: postId })
+//     const skip = (page - 1) * pageSize;
+
+//     const comments = await Comment.find({ post: postId })
 //         .populate("author", "username")
-//         .sort({ createdAt: -1 });
+//         .sort({ createdAt: -1 })
+//         .skip(skip)
+//         .limit(pageSize);
+
+//     const totalComments = await Comment.countDocuments({ post: postId });
+//     const nestedComments = buildNestedComments(comments);
+
+//     return {
+//         comments: nestedComments,
+//         totalComments,
+//         totalPages: Math.ceil(totalComments / pageSize),
+//         currentPage: page,
+//     };
 // };
 
+// // 📌 Service to update a comment
 // export const updateCommentService = async (
 //     commentIdRaw: string,
 //     contentRaw: unknown,
@@ -392,6 +444,7 @@ export const deleteCommentService = async (
 //     return updated;
 // };
 
+// // 📌 Service to delete a comment (and its children)
 // export const deleteCommentService = async (
 //     commentIdRaw: string,
 //     userId: string
