@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, ReactNode } from 'react';
-import Login from '../components/Login';
+import Login from '../components/NavBar/Login';
 
 interface AuthModalContextType {
     showLogin: boolean;

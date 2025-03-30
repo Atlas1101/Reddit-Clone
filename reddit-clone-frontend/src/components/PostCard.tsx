@@ -46,23 +46,13 @@ export default function PostCard({
 }: PostProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isOptionsOpen, setIsOptionsOpen] = useState(false);
-    const [isUpvoted, setIsUpvoted] = useState(false); // State for upvote
-    const [isDownvoted, setIsDownvoted] = useState(false); // State for downvote
+    const [isUpvoted, setIsUpvoted] = useState(false);
+    const [isDownvoted, setIsDownvoted] = useState(false);
     const [isHoveringCommunity, setIsHoveringCommunity] = useState(false);
 
-    console.log("PostCard imageUrl:", imageUrl);
-
-    const handleImageClick = () => {
-        setIsModalOpen(true);
-    };
-
-    const closeModal = () => {
-        setIsModalOpen(false);
-    };
-
-    const toggleOptions = () => {
-        setIsOptionsOpen(!isOptionsOpen);
-    };
+    const handleImageClick = () => setIsModalOpen(true);
+    const closeModal = () => setIsModalOpen(false);
+    const toggleOptions = () => setIsOptionsOpen(!isOptionsOpen);
 
     const { setShowLogin } = useAuthModal();
     const isLoggedIn = false; // Replace with actual auth check
@@ -91,11 +81,9 @@ export default function PostCard({
 
     const handleJoinCommunity = () => {
         handleProtectedAction(() => {
-            // Join community logic here
             console.log("Joining community");
         });
     };
-    console.log("PostCard link id:", id);
 
     return (
         <div className="bg-white shadow text-black space-y-1">
@@ -110,7 +98,6 @@ export default function PostCard({
                         alt="subreddit avatar"
                         className="w-6 h-6 rounded-full"
                     />
-
                     <div
                         className="relative inline-block"
                         onMouseEnter={() => setIsHoveringCommunity(true)}
@@ -122,12 +109,10 @@ export default function PostCard({
                         >
                             r/{subreddit}
                         </Link>
-
                         {isHoveringCommunity && (
                             <CommunityHoverCard communityId={communityId ?? ''} />
                         )}
                     </div>
-
                     <span>•</span>
                     <span>{createdAt}</span>
                 </div>
@@ -143,50 +128,32 @@ export default function PostCard({
                     </button>
                 </div>
             </div>
+
             {/* Options Modal */}
             {isOptionsOpen && (
                 <div className="fixed inset-0 z-50">
                     <div
                         className="absolute inset-0 bg-black opacity-50"
-                        onClick={toggleOptions} // Close options when clicking outside
+                        onClick={toggleOptions}
                     ></div>
-                    <div className="absolute bottom-0 left-0 w-full bg-white flex flex-col shadow-lg rounded-t-2xl  ">
+                    <div className="absolute bottom-0 left-0 w-full bg-white flex flex-col shadow-lg rounded-t-2xl">
                         <div className="flex justify-between items-center p-4 border-b">
                             <span className="font-bold p-2">Options</span>
-                            <button
-                                onClick={toggleOptions}
-                                className="text-gray-600"
-                            >
-                                <img
-                                    src={CloseIcon}
-                                    alt="Close"
-                                    className="w-4 h-4"
-                                />
+                            <button onClick={toggleOptions} className="text-gray-600">
+                                <img src={CloseIcon} alt="Close" className="w-4 h-4" />
                             </button>
                         </div>
-                        <div className="p-4 text-sm ">
-                            <div className="flex items-center space-x-2 hover:bg-gray-100 p-2 rounded ">
-                                <img
-                                    src={SaveIcon}
-                                    alt="Save"
-                                    className="w-5 h-5"
-                                />
+                        <div className="p-4 text-sm">
+                            <div className="flex items-center space-x-2 hover:bg-gray-100 p-2 rounded">
+                                <img src={SaveIcon} alt="Save" className="w-5 h-5" />
                                 <span>Save</span>
                             </div>
                             <div className="flex items-center space-x-2 hover:bg-gray-100 p-2 rounded">
-                                <img
-                                    src={HideIcon}
-                                    alt="Hide"
-                                    className="w-5 h-5"
-                                />
+                                <img src={HideIcon} alt="Hide" className="w-5 h-5" />
                                 <span>Hide</span>
                             </div>
                             <div className="flex items-center space-x-2 hover:bg-gray-100 p-2 rounded">
-                                <img
-                                    src={ReportIcon}
-                                    alt="Report"
-                                    className="w-5 h-5"
-                                />
+                                <img src={ReportIcon} alt="Report" className="w-5 h-5" />
                                 <span>Report</span>
                             </div>
                         </div>
@@ -194,6 +161,7 @@ export default function PostCard({
                 </div>
             )}
 
+            {/* Title and Body */}
             <Link
                 to={`/post/${id}`}
                 className="block space-y-2 hover:bg-gray-50 rounded-lg p-2"
@@ -201,22 +169,24 @@ export default function PostCard({
                 <h2 className="text-lg font-semibold text-gray-800">{title}</h2>
                 {body && <p className="text-sm text-gray-800">{body}</p>}
             </Link>
+
             {/* Image */}
             {imageUrl && (
                 <img
                     src={`http://localhost:5000${imageUrl}`}
                     alt="Post visual"
-                    className="w-full max-h-[512px] object-cover rounded-2xl"
+                    className="w-full max-h-[512px] object-cover rounded-2xl cursor-pointer"
                     onClick={handleImageClick}
                 />
             )}
+
             {/* Modal */}
             {isModalOpen && (
-                <div className="fixed bg-black inset-0 bg-opacity-75 flex justify-center items-center z-50">
+                <div className="fixed inset-0 bg-black bg-opacity-75 z-50 flex justify-center items-center">
+                    {/* Close button positioned relative to the entire screen */}
                     <button
                         onClick={closeModal}
-                        className="absolute top-4 right-4 text-white text-2xl z-50 rounded-full p-2"
-                        style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }} // Inline style for background opacity
+                        className="fixed top-4 right-4 text-white bg-black bg-opacity-50 rounded-full p-2 z-50"
                     >
                         <img
                             src={CloseIcon}
@@ -225,15 +195,16 @@ export default function PostCard({
                             style={{ filter: "invert(1)" }}
                         />
                     </button>
-                    <div className="relative">
-                        <img
-                            src={imageUrl}
-                            alt="Post visual"
-                            className="max-w-full max-h-full"
-                        />
-                    </div>
+
+                    {/* Image centered on screen */}
+                    <img
+                        src={`http://localhost:5000${imageUrl}`}
+                        alt="Post visual"
+                        className="max-w-[90vw] max-h-[90vh] object-contain rounded"
+                    />
                 </div>
             )}
+
             {/* Action bar */}
             <div className="flex items-center text-sm text-black text-semibold space-x-5 py-2">
                 <div
@@ -274,10 +245,7 @@ export default function PostCard({
                 </div>
                 <div
                     className="flex items-center space-x-1 bg-gray-200 p-1 rounded-full cursor-pointer"
-                    onClick={() => {
-                        // Handle share functionality
-                        console.log("Share clicked");
-                    }}
+                    onClick={() => console.log("Share clicked")}
                 >
                     <img src={ShareIcon} alt="Share" className="w-5 h-5" />
                     <span>Share</span>

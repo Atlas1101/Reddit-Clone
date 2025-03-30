@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import backIcon from "../assets/back-icon.svg";
-import SearchIcon from "../assets/search-icon.svg";
+import backIcon from "../../assets/back-icon.svg";
+import SearchIcon from "../../assets/search-icon.svg";
 
 interface SearchModalProps {
     isOpen: boolean;

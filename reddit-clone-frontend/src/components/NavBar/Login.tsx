@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import CloseIcon from '../assets/close-icon.svg';
-import { auth } from '../services/api';
-import { useUser } from '../context/UserContext';
+import CloseIcon from '../../assets/close-icon.svg';
+import { auth } from '../../services/api';
+import { useUser } from '../../context/UserContext';
 
 interface LoginProps {
     onClose?: () => void;

@@ -49,7 +49,6 @@ app.use("/api/comments", commentRoutes);
 app.use("/api/votes", voteRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/communities", communityRoutes);
-
 app.get("/", (req, res) => {
     res.send("API is running...aww yeee");
 });

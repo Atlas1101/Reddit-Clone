@@ -1,11 +1,11 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
-import { useAuthModal } from '../context/AuthModalContext';
-import { useUser } from "../context/UserContext";
+import { useAuthModal } from '../../context/AuthModalContext';
+import { useUser } from "../../context/UserContext";
 import Avatar from "./Avatar";
-import Sidebar from "./sidebar.tsx";
-import SearchIcon from "../assets/search-icon.svg";
-import backIcon from "../assets/back-icon.svg";
+import Sidebar from "./Sidebar";
+import SearchIcon from "../../assets/search-icon.svg";
+import backIcon from "../../assets/back-icon.svg";
 
 export default function Navbar() {
     const [showSidebar, setShowSidebar] = useState(false);
