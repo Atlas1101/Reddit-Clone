@@ -1,5 +1,4 @@
-import AvatarDropdown from "./AvatarDropDown.tsx"; // Correct import
-
+import AvatarDropdown from "./AvatarDropdown";
 
 export default function Avatar() {
     return (

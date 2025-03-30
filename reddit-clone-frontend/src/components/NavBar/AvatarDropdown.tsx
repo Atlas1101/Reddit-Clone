@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { useUser } from "../context/UserContext";
+import { useUser } from "../../context/UserContext";
 
 export default function AvatarDropdown() {
     const [isOpen, setIsOpen] = useState(false);
@@ -9,15 +9,19 @@ export default function AvatarDropdown() {
 
     const toggleDarkMode = () => {
         setDarkMode(!darkMode);
-        // Here you can add functionality to actually toggle dark mode in your app.
+        // Toggle actual dark mode theme logic here
     };
 
     return (
         <div className="relative">
             <button onClick={() => setIsOpen(!isOpen)} className="flex items-center space-x-2 p-1 hover:bg-gray-100 rounded-full">
-                <img
-                src="https://dummyimage.com/40x40/ccc/000&text=👤"
-                alt="User Avatar"
+            <img
+                src={
+                    user?.username
+                    ? `https://api.dicebear.com/7.x/fun-emoji/svg?seed=${user.username}`
+                    : "https://api.dicebear.com/7.x/fun-emoji/svg?seed=guest"
+                }
+                alt="User avatar"
                 className="w-10 h-10 rounded-full"
             />
             </button>
