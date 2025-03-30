@@ -38,16 +38,19 @@ export const auth = {
         // }
     },
     register: async (username: string, email: string, password: string) => {
-        const response = await api.post("/auth/register", {
-            username,
-            email,
-            password,
-        });
-        if (response.data.token) {
-            localStorage.setItem("token", response.data.token);
-            return response.data;
+        try {
+            const response = await api.post(
+                "/auth/register",
+                { username, email, password },
+                { withCredentials: true }
+            );
+            return response.data; // או return true אם לא צריך כלום
+        } catch (error: any) {
+            if (error.response?.data?.error) {
+                throw new Error(error.response.data.error);
+            }
+            throw new Error("Registration failed. Please try again.");
         }
-        throw new Error(response.data.error || "Registration failed");
     },
     logout: async () => {
         try {

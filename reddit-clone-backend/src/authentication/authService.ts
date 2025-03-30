@@ -14,11 +14,17 @@ export const registerUserService = async (input: UserRegisterInput) => {
         throw new Error("Email already registered");
     }
 
+    const existingUsername = await User.findOne({ username });
+    if (existingUsername) {
+        throw new Error("Username already taken");
+    }
+
     const newUser = new User({ username, email, password });
     await newUser.save();
 
     return newUser;
 };
+
 
 // ✅ Login user
 export const loginUserService = async (input: UserLoginInput) => {

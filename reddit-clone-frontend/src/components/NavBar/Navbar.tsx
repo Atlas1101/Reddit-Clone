@@ -1,11 +1,13 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
-import { useAuthModal } from '../../context/AuthModalContext';
 import { useUser } from "../../context/UserContext";
 import Avatar from "./Avatar";
 import Sidebar from "./Sidebar";
 import SearchIcon from "../../assets/search-icon.svg";
 import backIcon from "../../assets/back-icon.svg";
+import Login from "./Login";
+import Register from "./Register";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function Navbar() {
     const [showSidebar, setShowSidebar] = useState(false);
@@ -13,9 +15,8 @@ export default function Navbar() {
     const [showMenu, setShowMenu] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
     const [searchOpen, setSearchOpen] = useState(false);
-    const { setShowLogin } = useAuthModal();
+    const [authMode, setAuthMode] = useState<"login" | "register" | null>(null);
 
-    // Get user from context
     const { user, isLoading } = useUser();
 
     const handleCloseSidebar = () => {
@@ -23,7 +24,7 @@ export default function Navbar() {
         setTimeout(() => {
             setShowSidebar(false);
             setAnimateOut(false);
-        }, 300); // matches CSS animation duration
+        }, 300);
     };
 
     const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -36,10 +37,7 @@ export default function Navbar() {
         <>
             <nav className="bg-white border-b p-3 flex items-center justify-between">
                 <div className="flex items-center space-x-3">
-                    <button
-                        onClick={() => setShowSidebar(true)}
-                        className="text-2xl"
-                    >
+                    <button onClick={() => setShowSidebar(true)} className="text-2xl">
                         ☰
                     </button>
                     <Link to="/" className="text-xl">
@@ -51,7 +49,6 @@ export default function Navbar() {
                     </Link>
                 </div>
 
-                {/* Search Bar */}
                 <div className="flex-1 mx-4 hidden sm:block">
                     <div className="relative">
                         <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -68,7 +65,6 @@ export default function Navbar() {
                     </div>
                 </div>
 
-                {/* Mobile Search Icon */}
                 <button
                     onClick={() => setSearchOpen(true)}
                     className="p-2 hover:bg-gray-100 rounded-full sm:hidden"
@@ -88,8 +84,8 @@ export default function Navbar() {
                     {!isLoading && (user ? (
                         <Avatar />
                     ) : (
-                        <button 
-                            onClick={() => setShowLogin(true)}
+                        <button
+                            onClick={() => setAuthMode("login")}
                             className="bg-orange-600 text-white text-sm rounded-full px-4 py-1 font-semibold hover:bg-orange-700"
                         >
                             Log In
@@ -105,23 +101,20 @@ export default function Navbar() {
                 </div>
             </nav>
 
-            {/* Sidebar Overlay */}
             {showSidebar && (
-                <div 
-                className={`fixed inset-0 z-50 transition-opacity ${animateOut ? 'opacity-0' : 'opacity-100'}`}
-                style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
-                 onClick={handleCloseSidebar}
-                  />
+                <div
+                    className={`fixed inset-0 z-50 transition-opacity ${animateOut ? 'opacity-0' : 'opacity-100'}`}
+                    style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
+                    onClick={handleCloseSidebar}
+                />
             )}
 
-            {/* Sidebar Component */}
             {showSidebar && (
                 <div className={`fixed left-0 top-0 bottom-0 z-50 transition-transform ${animateOut ? '-translate-x-full' : 'translate-x-0'}`}>
                     <Sidebar />
                 </div>
             )}
 
-            {/* Mobile Full-Screen Search Modal */}
             {searchOpen && (
                 <div className="fixed inset-0 bg-white z-50 p-4 flex items-start justify-center">
                     <div className="relative w-full max-w-lg mx-auto">
@@ -145,6 +138,33 @@ export default function Navbar() {
                     </div>
                 </div>
             )}
+
+            <AnimatePresence>
+                {authMode && (
+                    <motion.div
+                        key={authMode}
+                        initial={{ x: authMode === "register" ? 500 : 0, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        exit={{ x: authMode === "login" ? -500 : 500, opacity: 0 }}
+                        transition={{ duration: 0.4 }}
+                        className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30"
+                    >
+                        <div className="relative w-full max-w-md">
+                            {authMode === "login" ? (
+                                <Login
+                                    onSwitch={() => setAuthMode("register")}
+                                    onClose={() => setAuthMode(null)}
+                                />
+                            ) : (
+                                <Register
+                                    onSwitch={() => setAuthMode("login")}
+                                    onClose={() => setAuthMode(null)}
+                                />
+                            )}
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </>
     );
 }

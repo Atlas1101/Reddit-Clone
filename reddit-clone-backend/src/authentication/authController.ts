@@ -1,4 +1,6 @@
 import { Request, Response } from "express";
+import { MongoServerError } from "mongodb";
+import { ZodError } from "zod";
 import {
     userLoginSchema,
     userRegisterSchema,
@@ -6,21 +8,28 @@ import {
 import { loginUserService, registerUserService } from "./authService";
 
 // ✅ Register
-export const registerUser = async (
-    req: Request,
-    res: Response
-): Promise<void> => {
+export const registerUser = async (req: Request, res: Response): Promise<void> => {
     try {
-        const parsedData = userRegisterSchema.parse(req.body);
-        const newUser = await registerUserService(parsedData);
-
-        res.status(201).json({ message: "User registered successfully" });
-    } catch (error) {
-        res.status(400).json({
-            error: (error as Error).message || "Invalid data",
-        });
+      const parsedData = userRegisterSchema.parse(req.body);
+      const newUser = await registerUserService(parsedData);
+  
+      res.status(201).json({ message: "User registered successfully" });
+    } catch (error: any) {
+      if (error instanceof ZodError) {
+        res.status(400).json({ error: error.flatten() });
+        return;
+      }
+  
+      if (error instanceof MongoServerError && error.code === 11000) {
+        const field = Object.keys(error.keyPattern)[0];
+        res.status(400).json({ error: `${field} already taken` });
+        return;
+      }
+  
+      console.error("Unknown error:", error);
+      res.status(500).json({ error: "Internal server error" });
     }
-};
+  };
 
 // ✅ Login
 export const loginUser = async (req: Request, res: Response): Promise<void> => {

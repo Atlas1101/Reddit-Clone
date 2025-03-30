@@ -5,9 +5,10 @@ import { useUser } from '../../context/UserContext';
 
 interface LoginProps {
     onClose?: () => void;
+    onSwitch?: () => void;
 }
 
-export default function Login({ onClose }: LoginProps) {
+export default function Login({ onClose ,onSwitch }: LoginProps) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const { fetchUser } = useUser(); // Access the fetchUser function from context
@@ -45,7 +46,9 @@ export default function Login({ onClose }: LoginProps) {
                     <a href="#" className="text-blue-500">Privacy Policy</a>.
                 </p>
 
-                {/* Third-Party Login Options */}
+
+            {/* -----------------WIP--------------------------------------------------------------------------------------------------- */}
+                {/* Third-Party Login Options
                 <button className="w-full mb-2 border rounded-full py-2 px-4 flex items-center justify-center gap-2 hover:bg-gray-50">
                     <img src="/google-icon.png" alt="Google" className="w-5 h-5" />
                     <span>Continue with Google</span>
@@ -56,9 +59,11 @@ export default function Login({ onClose }: LoginProps) {
                     <span>Continue with Apple</span>
                 </button>
 
-                <div className="text-center text-gray-500 my-2">OR</div>
+                <div className="text-center text-gray-500 my-2">OR</div> */}
 
                 {/* Email and Password Form */}
+            {/* -----------------WIP--------------------------------------------------------------------------------------------------- */}
+                
                 <form className="space-y-4 flex-1 flex flex-col" onSubmit={handleSubmit}>
                     <div>
                         <input
@@ -89,7 +94,13 @@ export default function Login({ onClose }: LoginProps) {
                     {/* Sign Up Link */}
                     <div className="text-sm">
                         New to Reddit?{' '}
-                        <a href="#" className="text-blue-500">Sign Up</a>
+                        <button
+                            type="button"
+                            onClick={onSwitch}
+                            className="text-blue-500 underline"
+                        >
+                            Sign Up
+                        </button>
                     </div>
 
                     {/* Login Button */}
