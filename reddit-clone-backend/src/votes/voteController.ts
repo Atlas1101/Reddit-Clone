@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { z } from "zod";
 import { castVoteService, removeVoteService } from "./voteService";
+import { getVoteScoreService } from "./voteService";
 
 interface AuthRequest extends Request {
     user?: { id: string; email: string };
@@ -9,7 +10,7 @@ interface AuthRequest extends Request {
 const voteSchema = z.object({
     targetId: z.string().length(24),
     targetType: z.enum(["post", "comment"]),
-    voteType: z.union([z.literal(1), z.literal(-1)]),
+    voteType: z.union([z.literal(1), z.literal(-1), z.literal(0)]),
 });
 
 // @desc    Cast or update a vote
@@ -24,6 +25,17 @@ export const castVote = async (
         }
 
         const { targetId, targetType, voteType } = voteSchema.parse(req.body);
+
+        if (voteType === 0) {
+            const result = await removeVoteService({
+                userId: req.user.id,
+                targetIdRaw: targetId,
+                targetType,
+            });
+            res.status(200).json(result);
+            return;
+        }
+
         const result = await castVoteService({
             userId: req.user.id,
             targetIdRaw: targetId,
@@ -44,7 +56,30 @@ export const castVote = async (
     }
 };
 
-// @desc    Remove a vote
+export const getVoteScore = async (
+    req: Request,
+    res: Response
+): Promise<void> => {
+    try {
+        const { type, id } = req.query;
+
+        if (!id || (type !== "post" && type !== "comment")) {
+            res.status(400).json({ message: "Invalid query" });
+            return;
+        }
+
+        const score = await getVoteScoreService({
+            entityId: id as string,
+            entityType: type as "post" | "comment",
+        });
+
+        res.status(200).json({ score });
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching score" });
+    }
+};
+
+// to be deleted
 export const removeVote = async (
     req: AuthRequest,
     res: Response

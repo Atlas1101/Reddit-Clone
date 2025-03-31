@@ -11,37 +11,98 @@ export const castVoteService = async ({
     userId: string;
     targetIdRaw: string;
     targetType: "post" | "comment";
-    voteType: 1 | -1;
+    voteType: 1 | -1 | 0;
 }) => {
     const targetId = objectIdSchema.parse(targetIdRaw);
 
     const existing = await Vote.findOne({
         user: userId,
-        entityId: targetId,   
-        entityType: targetType, 
+        entityId: targetId,
+        entityType: targetType,
     });
 
     if (existing) {
         if (existing.voteType === voteType) {
-            throw new Error("Already voted");
+            // Toggle off the vote (remove it)
+            await Vote.deleteOne({ _id: existing._id });
+
+            const score = await Vote.aggregate([
+                { $match: { entityId: targetId } },
+                { $group: { _id: null, total: { $sum: "$voteType" } } },
+            ]);
+            const finalScore = score[0]?.total || 0;
+
+            return {
+                message: "Vote removed",
+                userVote: 0,
+                score: finalScore,
+            };
         }
 
         existing.voteType = voteType;
         await existing.save();
-        return { message: "Vote updated" };
+
+        const score = await Vote.aggregate([
+            { $match: { entityId: targetId } },
+            { $group: { _id: null, total: { $sum: "$voteType" } } },
+        ]);
+        const finalScore = score[0]?.total || 0;
+
+        return {
+            message: "Vote updated",
+            userVote: voteType,
+            score: finalScore,
+        };
     }
 
     const newVote = new Vote({
         user: new mongoose.Types.ObjectId(userId),
-        entityId: targetId,   
-        entityType: targetType, 
+        entityId: targetId,
+        entityType: targetType,
         voteType,
     });
 
     await newVote.save();
-    return { message: "Vote cast" };
+
+    const score = await Vote.aggregate([
+        { $match: { entityId: targetId } },
+        { $group: { _id: null, total: { $sum: "$voteType" } } },
+    ]);
+    const finalScore = score[0]?.total || 0;
+
+    return {
+        message: "Vote cast",
+        userVote: voteType,
+        score: finalScore,
+    };
 };
 
+export const getVoteScoreService = async ({
+    entityId,
+    entityType,
+}: {
+    entityId: string;
+    entityType: "post" | "comment";
+}) => {
+    const score = await Vote.aggregate([
+        {
+            $match: {
+                entityId: new mongoose.Types.ObjectId(entityId),
+                entityType,
+            },
+        },
+        {
+            $group: {
+                _id: null,
+                total: { $sum: "$voteType" },
+            },
+        },
+    ]);
+
+    return score[0]?.total || 0;
+};
+
+///to be deleted
 export const removeVoteService = async ({
     userId,
     targetIdRaw,
@@ -55,8 +116,8 @@ export const removeVoteService = async ({
 
     const result = await Vote.findOneAndDelete({
         user: userId,
-        entityId: targetId,      
-        entityType: targetType,  
+        entityId: targetId,
+        entityType: targetType,
     });
 
     if (!result) throw new Error("Vote not found");

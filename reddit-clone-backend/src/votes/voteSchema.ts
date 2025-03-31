@@ -17,7 +17,7 @@ const VoteSchema = new mongoose.Schema<IVote>(
         },
         entityType: { type: String, enum: ["post", "comment"], required: true },
         entityId: { type: mongoose.Schema.Types.ObjectId, required: true },
-        voteType: { type: Number, enum: [1, -1], required: true },
+        voteType: { type: Number, enum: [1, 0, -1], required: true },
     },
     { timestamps: true }
 );
