@@ -15,7 +15,7 @@ export default function CommunityPage() {
     const [loading, setLoading] = useState(true);
     const [isJoining, setIsJoining] = useState(false);
   
-    const isMember = user?.subscribedCommunities?.some(...) ?? false;
+    const isMember = user?.subscribedCommunities?.some(c => c._id === community?._id);
   
     useEffect(() => {
       const fetchCommunity = async () => {
