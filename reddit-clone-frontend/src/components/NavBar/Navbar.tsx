@@ -1,29 +1,20 @@
-<<<<<<< HEAD
-import { Link } from "react-router-dom";
-import { useState } from "react";
-=======
 import { Link, useNavigate } from "react-router-dom"; // Import useNavigate
 import { useEffect, useState, useRef } from "react"; // Import useRef
 import { useAuthModal } from "../../context/AuthModalContext";
->>>>>>> da468ffa8b3dd9802e4b12635f07421943295192
 import { useUser } from "../../context/UserContext";
 import Avatar from "./Avatar";
 import SidebarComponent from "./Sidebar";
 import SearchIcon from "../../assets/search-icon.svg";
-<<<<<<< HEAD
-import backIcon from "../../assets/back-icon.svg";
-import Login from "./Login";
-import Register from "./Register";
-import { motion, AnimatePresence } from "framer-motion";
-=======
 import backIcon from "../../assets/back-icon.svg"; // Keep if Sidebar uses it
 import SearchModal from "./SearchModal"; // Keep for mobile
 import { api } from "../../services/api";
 import { Post } from "../../types/Post";
 
+
 interface SidebarProps {
     onClose: () => void;
 }
+
 
 export function Sidebar({ onClose }: SidebarProps) {
     return (
@@ -35,33 +26,29 @@ export function Sidebar({ onClose }: SidebarProps) {
         </div>
     );
 }
->>>>>>> da468ffa8b3dd9802e4b12635f07421943295192
+
 
 export default function Navbar() {
     const [showSidebar, setShowSidebar] = useState(false);
     const [animateOut, setAnimateOut] = useState(false);
-<<<<<<< HEAD
-    const [showMenu, setShowMenu] = useState(false);
-    const [searchQuery, setSearchQuery] = useState("");
-    const [searchOpen, setSearchOpen] = useState(false);
-    const [authMode, setAuthMode] = useState<"login" | "register" | null>(null);
 
-=======
 
     // State for Desktop Search Dropdown
     const [searchQuery, setSearchQuery] = useState(""); // Query for desktop input
     const [filteredPosts, setFilteredPosts] = useState<Post[]>([]); // Filtered results for dropdown
     const [showResults, setShowResults] = useState(false); // Visibility of dropdown
 
+
     // State for Mobile Search Modal
     const [searchOpen, setSearchOpen] = useState(false); // Visibility of modal
 
+
     const [allPosts, setAllPosts] = useState<Post[]>([]); // Holds all fetched posts
     const { setShowLogin } = useAuthModal();
->>>>>>> da468ffa8b3dd9802e4b12635f07421943295192
     const { user, isLoading } = useUser();
     const navigate = useNavigate(); // Hook for navigation
     const searchContainerRef = useRef<HTMLDivElement>(null); // Ref for click-outside detection
+
 
     // Fetch all posts on mount
     useEffect(() => {
@@ -73,6 +60,7 @@ export default function Navbar() {
             .catch((err) => console.error("Failed to load posts", err));
     }, []);
 
+
     // Filter posts based on desktop search query
     useEffect(() => {
         if (searchQuery.trim() === "") {
@@ -82,6 +70,7 @@ export default function Navbar() {
             return;
         }
 
+
         const lowerCaseQuery = searchQuery.toLowerCase();
         const results = allPosts.filter((post) =>
             post.title.toLowerCase().includes(lowerCaseQuery)
@@ -89,6 +78,7 @@ export default function Navbar() {
         setFilteredPosts(results);
         setShowResults(true); // Show results when there's a query and filtering is done
     }, [searchQuery, allPosts]); // Re-run when query or the list of all posts changes
+
 
     // Handle clicks outside the search input and results dropdown
     useEffect(() => {
@@ -108,6 +98,7 @@ export default function Navbar() {
         };
     }, []); // Empty dependency array means this effect runs only once
 
+
     const handleCloseSidebar = () => {
         setAnimateOut(true);
         setTimeout(() => {
@@ -116,12 +107,14 @@ export default function Navbar() {
         }, 300);
     };
 
+
     // Handle clicking a result in the dropdown
     const handleResultClick = (postId: string) => {
         navigate(`/post/${postId}`); // Navigate to the post page
         setShowResults(false); // Hide the results dropdown
         setSearchQuery(""); // Optional: Clear the search bar after selection
     };
+
 
     return (
         <>
@@ -146,16 +139,11 @@ export default function Navbar() {
                         />
                     </Link>
                 </div>
-<<<<<<< HEAD
-
-                <div className="flex-1 mx-4 hidden sm:block">
-=======
                 {/* --- Desktop Search Bar & Results --- */}
                 <div
                     className="flex-1 mx-4 hidden sm:block relative"
                     ref={searchContainerRef} // Attach ref here
                 >
->>>>>>> da468ffa8b3dd9802e4b12635f07421943295192
                     <div className="relative">
                         {" "}
                         {/* Container for input and icon */}
@@ -185,6 +173,7 @@ export default function Navbar() {
                             aria-label="Search Reddit"
                         />
                     </div>
+
 
                     {/* Desktop Search Results Dropdown */}
                     {showResults && filteredPosts.length > 0 && (
@@ -224,12 +213,8 @@ export default function Navbar() {
                             </div>
                         )}
                 </div>
-<<<<<<< HEAD
-
-=======
                 {/* --- End Desktop Search --- */}
                 {/* --- Mobile Search Icon --- */}
->>>>>>> da468ffa8b3dd9802e4b12635f07421943295192
                 <button
                     onClick={() => setSearchOpen(true)} // Opens the modal
                     className="p-2 hover:bg-gray-100 rounded-full sm:hidden"
@@ -250,18 +235,7 @@ export default function Navbar() {
                         </span>
                     </Link>
 
-<<<<<<< HEAD
-                    {!isLoading && (user ? (
-                        <Avatar />
-                    ) : (
-                        <button
-                            onClick={() => setAuthMode("login")}
-                            className="bg-orange-600 text-white text-sm rounded-full px-4 py-1 font-semibold hover:bg-orange-700"
-                        >
-                            Log In
-                        </button>
-                    ))}
-=======
+
                     {/* Auth Buttons/Avatar */}
                     {!isLoading &&
                         (user ? (
@@ -274,7 +248,7 @@ export default function Navbar() {
                                 Log In
                             </button>
                         ))}
->>>>>>> da468ffa8b3dd9802e4b12635f07421943295192
+
 
                     {/* Optional Menu Button */}
                     {/* <button
@@ -287,16 +261,7 @@ export default function Navbar() {
                 </div>
             </nav>
 
-<<<<<<< HEAD
-            {showSidebar && (
-                <div
-                    className={`fixed inset-0 z-50 transition-opacity ${animateOut ? 'opacity-0' : 'opacity-100'}`}
-                    style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
-                    onClick={handleCloseSidebar}
-                />
-            )}
 
-=======
             {/* Sidebar Overlay & Component (Keep as is) */}
             {showSidebar && (
                 <div
@@ -309,7 +274,6 @@ export default function Navbar() {
                     aria-hidden="true"
                 />
             )}
->>>>>>> da468ffa8b3dd9802e4b12635f07421943295192
             {showSidebar && (
                 <div
                     className={`fixed left-0 top-0 bottom-0 w-64 bg-white z-50 transition-transform transform ${
@@ -322,65 +286,16 @@ export default function Navbar() {
                 </div>
             )}
 
-<<<<<<< HEAD
-            {searchOpen && (
-                <div className="fixed inset-0 bg-white z-50 p-4 flex items-start justify-center">
-                    <div className="relative w-full max-w-lg mx-auto">
-                        <button
-                            onClick={() => setSearchOpen(false)}
-                            className="absolute left-2 top-2 text-2xl"
-                        >
-                            <img src={backIcon} alt="Back" className="w-5 h-5 fixed left-2" />
-                        </button>
-                        <div className="flex items-center space-x-2 bg-gray-100 rounded-full px-4 py-2 shadow-md w-full">
-                            <img src={SearchIcon} alt="Search" className="w-5 h-5" />
-                            <input
-                                type="text"
-                                placeholder="Search Reddit"
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                onKeyDown={handleSearch}
-                                className="w-full bg-transparent focus:outline-none text-gray-700"
-                            />
-                        </div>
-                    </div>
-                </div>
-            )}
 
-            <AnimatePresence>
-                {authMode && (
-                    <motion.div
-                        key={authMode}
-                        initial={{ x: authMode === "register" ? 500 : 0, opacity: 0 }}
-                        animate={{ x: 0, opacity: 1 }}
-                        exit={{ x: authMode === "login" ? -500 : 500, opacity: 0 }}
-                        transition={{ duration: 0.4 }}
-                        className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30"
-                    >
-                        <div className="relative w-full max-w-md">
-                            {authMode === "login" ? (
-                                <Login
-                                    onSwitch={() => setAuthMode("register")}
-                                    onClose={() => setAuthMode(null)}
-                                />
-                            ) : (
-                                <Register
-                                    onSwitch={() => setAuthMode("login")}
-                                    onClose={() => setAuthMode(null)}
-                                />
-                            )}
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-=======
             {/* Search Modal (for mobile - keep as is) */}
             <SearchModal
                 isOpen={searchOpen}
                 onClose={() => setSearchOpen(false)}
                 posts={allPosts} // Pass all posts to the modal as well
             />
->>>>>>> da468ffa8b3dd9802e4b12635f07421943295192
         </>
     );
 }
+
+
+

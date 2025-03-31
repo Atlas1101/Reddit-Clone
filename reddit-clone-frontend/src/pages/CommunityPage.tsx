@@ -105,7 +105,7 @@ export default function CommunityPage() {
         <div className="max-w-6xl mx-auto mt-4 px-4 grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="md:col-span-2 space-y-4">
             {posts.map((post) => (
-              <PostCard key={post.id} {...post} />
+              <PostCard key={post._id} {...post} />
             ))}
           </div>
   
