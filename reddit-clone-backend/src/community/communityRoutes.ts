@@ -9,12 +9,16 @@ import {
     leaveCommunity,
     addCommunityRule,
     getAllCommunities,
+    getCommunityByName,
 } from "../community/communityController";
 
 const router = Router();
 
 // Create a community
 router.post("/", protect, createCommunity);
+
+// Get community by name (for the frontend)
+router.get("/name/:name", getCommunityByName);
 
 // Get community by ID
 router.get("/:id", getCommunityById);
@@ -36,5 +40,6 @@ router.post("/:id/leave", protect, leaveCommunity);
 
 // Add a community rule
 router.post("/:id/rules", protect, addCommunityRule);
+
 
 export default router;

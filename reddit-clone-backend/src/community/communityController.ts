@@ -9,8 +9,7 @@ import {
     addCommunityRuleService,
     getAllCommunitiesService,
 } from "../community/communityService";
-
-import { createCommunitySchema } from "../middleware/validateAuth"; // adjust path as needed
+import Community from "./communitySchema";
 
 // Authenticated request type
 interface AuthRequest extends Request {
@@ -174,3 +173,21 @@ export const deleteCommunity = async (
         res.status(500).json({ message: (error as Error).message });
     }
 };
+
+export const getCommunityByName = async (req: Request, res: Response): Promise<void> => {
+    const { name } = req.params;
+  
+    try {
+      const community = await Community.findOne({ name });
+  
+      if (!community) {
+        res.status(404).json({ message: "Community not found" });
+        return;
+      }
+  
+      res.status(200).json(community);
+    } catch (error) {
+      console.error("Error fetching community by name:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  };

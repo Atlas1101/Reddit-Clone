@@ -6,7 +6,7 @@ export type Post = {
     author: string;
     createdAt: string;
     score: number;
-    commentCount: number;
+    comments: number;
     postType: "text" | "image" | "link" | "poll";
     subreddit?: string;
     subredditIcon?: string;

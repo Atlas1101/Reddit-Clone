@@ -98,8 +98,8 @@ export default function PostPage() {
                             alt="Comments"
                             className="w-5 h-5"
                         />
-                        {post.commentCount > 0 && (
-                            <span>{post.commentCount} Comments</span>
+                        {post.comments > 0 && (
+                            <span>{post.comments} Comments</span>
                         )}
                     </div>
                     <button className="flex items-center space-x-1 bg-gray-100 rounded-full px-3 py-1">
