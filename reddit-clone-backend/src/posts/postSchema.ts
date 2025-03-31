@@ -19,6 +19,7 @@ interface IPost extends mongoose.Document {
     postType: PostType;
     commentCount: number;
     createdAt: Date;
+    _id: mongoose.Types.ObjectId;
 }
 
 const PostSchema = new mongoose.Schema<IPost>(
