@@ -129,16 +129,12 @@ export default function Navbar() {
                 {" "}
                 {/* Add z-index if needed */}
                 <div className="flex items-center space-x-3">
-<<<<<<< HEAD
-                    <button onClick={() => setShowSidebar(true)} className="text-2xl">
-=======
                     {/* Sidebar Toggle */}
                     <button
                         onClick={() => setShowSidebar(true)}
                         className="text-2xl"
                         aria-label="Open menu"
                     >
->>>>>>> da468ffa8b3dd9802e4b12635f07421943295192
                         ☰
                     </button>
                     {/* Logo */}
